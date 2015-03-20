@@ -13,7 +13,6 @@ import java.util.Map;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
-import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 
 /**
