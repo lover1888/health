@@ -49,7 +49,7 @@ public class FetchDoctors {
 				System.arraycopy(buff, 0, temp, 0, readed);
 				os.write(temp);
 			}
-			is.close(); 
+			is.close();  
 			os.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
