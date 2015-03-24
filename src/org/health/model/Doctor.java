@@ -7,6 +7,9 @@
  */
 package org.health.model;
 
+import java.util.List;
+
+import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -16,5 +19,18 @@ import org.nutz.dao.entity.annotation.Table;
  */
 @Table("tb_doctor")
 public class Doctor {
+	
+	@Id
+	private long doctorID;
+	
+	private long departmentID;
+	
+	private long hospitalID;
+	
+	private List<Hospital> hospital;
+	
+	
+	
+	
 
 }
