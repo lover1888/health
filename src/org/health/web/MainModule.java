@@ -13,13 +13,20 @@ import java.util.Map;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.IocBy;
+import org.nutz.mvc.annotation.Modules;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.SetupBy;
+import org.nutz.mvc.ioc.provider.ComboIocProvider;
 
 /**
  * @Description TODO
  * @author jhengfei
  * @date 2015年3月18日 下午5:06:09
  */
+@IocBy(type=ComboIocProvider.class, args={"*json"})
+@SetupBy(AppStartup.class)
+@Modules(scanPackage=true)
 public class MainModule {
 	Log log = Logs.getLog(MainModule.class);
 	

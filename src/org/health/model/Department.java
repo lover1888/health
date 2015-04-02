@@ -10,7 +10,7 @@ package org.health.model;
 import java.util.List;
 
 import org.nutz.dao.entity.annotation.Id;
-import org.nutz.dao.entity.annotation.Many;
+import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
@@ -36,7 +36,7 @@ public class Department {
 
 	private String departmentLocation;
 	
-	@Many(target=Doctor.class, field="departmentID")
+	@ManyMany(target=Doctor.class, relation="tb_department_doctor", from="departmentID", to="doctorID")
 	private List<Doctor> doctors;
 
 	/**
