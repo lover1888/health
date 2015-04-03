@@ -7,12 +7,23 @@
  */
 package org.health.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.health.common.page.Pagination;
 import org.health.model.Question;
+import org.health.util.KbbConstants;
+import org.health.vo.AnswerVo;
+import org.health.vo.QuestionDetailVo;
 import org.nutz.dao.Cnd;
+import org.nutz.dao.Sqls;
+import org.nutz.dao.entity.Entity;
+import org.nutz.dao.impl.sql.callback.EntityCallback;
 import org.nutz.dao.pager.Pager;
+import org.nutz.dao.sql.Sql;
+import org.nutz.dao.sql.SqlContext;
+import org.nutz.lang.Strings;
 import org.nutz.service.EntityService;
 
 /**
@@ -70,12 +81,48 @@ public class QuestionService extends EntityService<Question> {
 	 * @param questionId
 	 * @return
 	 */
-	public Question getQuestionDetail(String questionId) {
+	public QuestionDetailVo getQuestionDetail(String questionId, String userId) {
+		EntityCallback callback = new EntityCallback(){
+			@Override
+			protected QuestionDetailVo process(ResultSet rs, Entity<?> entity,
+					SqlContext context) throws SQLException {
+				
+				QuestionDetailVo rlt = new QuestionDetailVo();
+				if (null != rs && rs.next()) {
+		            rlt.setQuestion((Question)entity.getObject(rs, context.getFieldMatcher(), null));
+				}
+				rlt.setUserName(rs.getString("userName"));
+				rlt.setReputation(rs.getInt("reputationCount"));
+				rlt.setImgUrl(rs.getString("imageUrl"));
+				rlt.setFocus(rs.getString("isFocus")==null?false:true);
+				rlt.setFavorite(rs.getString("isFav")==null?false:true);
+		        return rlt;
+			}
+		};
 		
-		String sql = "select * from tb_question as q, tb_user as u where q.questionId=";
-		
-		
-		return null;
+		Sql sql;
+		if(Strings.isEmpty(userId)){
+			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl from tb_question q, tb_user u where q.questionId=@q1 and q.userId=u.userId");
+			sql.params().set("q1", questionId);
+		} else {
+			// 查询指定问题的详细信息，提问人的详细信息，当前用户是否收藏了该问题，是否关注了该问题
+			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl, (select id from tb_user_focus uf where uf.sourceId=@q1  and uf.sourceType=@s1 and uf.userId=@u1) as isFocus, (select tuf.id from tb_user_favorites ufa, tb_user_fav tuf where tuf.sourceId=@s2 and ufa.userId=@u2 and tuf.sourceType=@s2 and tuf.favoritesId=ufa.id) as isFav from tb_question q, tb_user u where q.questionId=@q3 and q.userId=u.userId");
+			sql.params().set("q1", questionId);
+			sql.params().set("s1", KbbConstants.SourceType.QUESTION.getValue());
+			sql.params().set("u1", userId);
+			sql.params().set("q2", questionId);
+			sql.params().set("s2", KbbConstants.SourceType.QUESTION.getValue());
+			sql.params().set("u2", userId);
+			sql.params().set("q3", questionId);
+		}
+		sql.setCallback(callback);
+		dao().execute(sql);
+		return sql.getObject(QuestionDetailVo.class);
 	}
+	
+//	public Pagination<AnswerVo> getAnswersByQuestion(String questionId, int pageNum, int pageSize) {
+//		
+//	}
+	
 
 }

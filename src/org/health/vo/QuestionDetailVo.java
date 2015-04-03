@@ -28,5 +28,77 @@ public class QuestionDetailVo extends BaseVo {
 	private List<Comments> comments;
 	
 	private List<Answers> answers;
+
+	/**  
+	 * @return the isFocus  
+	 */
+	public boolean isFocus() {
+		return isFocus;
+	}
+
+	/**  
+	 * @param isFocus the isFocus to set  
+	 */
+	public void setFocus(boolean isFocus) {
+		this.isFocus = isFocus;
+	}
+
+	/**  
+	 * @return the isFavorite  
+	 */
+	public boolean isFavorite() {
+		return isFavorite;
+	}
+
+	/**  
+	 * @param isFavorite the isFavorite to set  
+	 */
+	public void setFavorite(boolean isFavorite) {
+		this.isFavorite = isFavorite;
+	}
+
+	/**  
+	 * @return the question  
+	 */
+	public Question getQuestion() {
+		return question;
+	}
+
+	/**  
+	 * @param question the question to set  
+	 */
+	public void setQuestion(Question question) {
+		this.question = question;
+	}
+
+	/**  
+	 * @return the comments  
+	 */
+	public List<Comments> getComments() {
+		return comments;
+	}
+
+	/**  
+	 * @param comments the comments to set  
+	 */
+	public void setComments(List<Comments> comments) {
+		this.comments = comments;
+	}
+
+	/**  
+	 * @return the answers  
+	 */
+	public List<Answers> getAnswers() {
+		return answers;
+	}
+
+	/**  
+	 * @param answers the answers to set  
+	 */
+	public void setAnswers(List<Answers> answers) {
+		this.answers = answers;
+	}
+	
+	
 	
 }
