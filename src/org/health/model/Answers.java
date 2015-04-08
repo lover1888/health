@@ -9,7 +9,7 @@ package org.health.model;
 
 import java.util.Date;
 
-import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Table;
 
@@ -20,7 +20,7 @@ import org.nutz.dao.entity.annotation.Table;
  */
 @Table("tb_answers")
 public class Answers {
-	@Id
+	@Name
 	private String answersId;
 	private String questionId;
 

@@ -9,11 +9,15 @@ package org.health.service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.health.common.page.Pagination;
+import org.health.model.Answers;
+import org.health.model.Comments;
 import org.health.model.Question;
 import org.health.util.KbbConstants;
+import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.dao.Cnd;
@@ -23,6 +27,7 @@ import org.nutz.dao.impl.sql.callback.EntityCallback;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Sql;
 import org.nutz.dao.sql.SqlContext;
+import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.service.EntityService;
 
@@ -31,6 +36,7 @@ import org.nutz.service.EntityService;
  * @author jhengfei
  * @date 2015年4月1日 下午2:27:54
  */
+@IocBean(fields = { "dao" })
 public class QuestionService extends EntityService<Question> {
 	
 	public List<Question> list(){
@@ -120,9 +126,73 @@ public class QuestionService extends EntityService<Question> {
 		return sql.getObject(QuestionDetailVo.class);
 	}
 	
-//	public Pagination<AnswerVo> getAnswersByQuestion(String questionId, int pageNum, int pageSize) {
-//		
-//	}
+	public Pagination<AnswerVo> getAnswersByQuestion(String questionId, int pageNum, int pageSize) {
+//		Trans.exec(Connection.TRANSACTION_READ_COMMITTED, new Atom(){
+//			@Override
+//			public void run() {
+//			}
+//		});
+		
+		EntityCallback callback = new EntityCallback(){
+			@Override
+			protected List<AnswerVo> process(ResultSet rs, Entity<?> entity,
+					SqlContext context) throws SQLException {
+				List<AnswerVo> vos = new ArrayList<AnswerVo>();
+				AnswerVo vo;
+				while(rs.next()) {
+					vo = new AnswerVo();
+					vo.setAnswers((Answers)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setUserName(rs.getString("userName"));
+					vo.setReputation(rs.getInt("reputationCount"));
+					vo.setImgUrl(rs.getString("imageUrl"));
+					vos.add(vo);
+				}
+		        return vos;
+			}
+		};
+		
+		Sql sql = Sqls.create("select a.*,u.userName, u.reputationCount from tb_answers a, tb_user u where a.questionId=@q1 and a.userId=u.userId");
+		sql.params().set("q1", questionId);
+		sql.setCallback(callback);
+		dao().execute(sql);
+		return new Pagination<AnswerVo>(pageNum, pageSize, 0, sql.getList(AnswerVo.class));
+	}
+	
+	/**
+	 * 获取评论信息
+	 * @Description TODO
+	 * @param sourceId
+	 * @param sourceType
+	 * @return
+	 */
+	public List<Comments> getComments(String sourceId, String sourceType) {
+		return dao().query(Comments.class, Cnd.where("sourceId", "=", sourceId).and("sourceType","=",sourceType));
+	}
+	
+	/**
+	 * 保存问题
+	 * @Description TODO
+	 * @param question
+	 * @return
+	 */
+	public boolean saveQuestion(Question question) {
+		question.setQuestionId(KbbUtils.generateID());
+		Question q = dao().insert(question);
+		return q!=null;
+	}
+	
+	/**
+	 * 更新问题
+	 * @Description TODO
+	 * @param question
+	 * @return
+	 */
+	public boolean updateQuestion(Question question){
+		int rlt = dao().update(question);
+		return rlt==1;
+	}
+	
+	
 	
 
 }
