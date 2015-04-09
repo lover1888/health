@@ -1,16 +1,32 @@
-<%@ page contentType="text/html;�charset=UTF-8" %>
-<%@ include file="/WEB-INF/jsp/head.jsp" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>  
+<%@include file="/WEB-INF/jsp/head.jsp" %>
 <html>
 <head>
-<title>I am hello ^_^</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">  
+<title>看病吧</title>
 </head>
 <body>
-pageNo=${pgs.pageNo }<br>
-pageSize=${pgs.pageSize }<br>
-totalCount=${pgs.totalCount }<br>
-<c:forEach items="${pgs.list }" var="q">
-	${ q.questionId}---${q.title }---${q.content }<br>
+<a href="<c:url value='/login' />">登录</a>
+<h1>问题列表</h1>
+<table><tr>
+	<td><a href="<c:url value='/question/newest' />">最新的</a></td>
+	<td><a href="<c:url value='/question/hottest' />">热门的</a></td>
+	<td><a href="<c:url value='/question/unanswered' />">未回答</a></td>
+</tr></table>
+<table border="1">
+<c:forEach items="${pagination.list }" var="q">
+	<tr>
+		<td> ${q.voteCount} 投票</td>
+		<td>${q.answersCount }回答</td>
+		<td>${q.viewCount }浏览</td>
+		<td>
+		<a href="<c:url value='/q/${q.questionId }' /> ">${q.title}</a> 
+		--
+		<fmt:formatDate value="${q.createDate }" pattern="MM-dd HH:mm"/>
+		</td>
+		<td>${q.tags }</td>
+	</tr>
 </c:forEach>
-
+</table>
 </body>
 </html>

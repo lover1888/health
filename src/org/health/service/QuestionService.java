@@ -100,8 +100,12 @@ public class QuestionService extends EntityService<Question> {
 				rlt.setUserName(rs.getString("userName"));
 				rlt.setReputation(rs.getInt("reputationCount"));
 				rlt.setImgUrl(rs.getString("imageUrl"));
-				rlt.setFocus(rs.getString("isFocus")==null?false:true);
-				rlt.setFavorite(rs.getString("isFav")==null?false:true);
+//				try {
+//					rlt.setFocus(rs.getString("isFocus")==null?false:true);
+//					rlt.setFavorite(rs.getString("isFav")==null?false:true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
 		        return rlt;
 			}
 		};
@@ -109,10 +113,12 @@ public class QuestionService extends EntityService<Question> {
 		Sql sql;
 		if(Strings.isEmpty(userId)){
 			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl from tb_question q, tb_user u where q.questionId=@q1 and q.userId=u.userId");
+			sql.setEntity(dao().getEntity(Question.class));
 			sql.params().set("q1", questionId);
 		} else {
 			// 查询指定问题的详细信息，提问人的详细信息，当前用户是否收藏了该问题，是否关注了该问题
 			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl, (select id from tb_user_focus uf where uf.sourceId=@q1  and uf.sourceType=@s1 and uf.userId=@u1) as isFocus, (select tuf.id from tb_user_favorites ufa, tb_user_fav tuf where tuf.sourceId=@s2 and ufa.userId=@u2 and tuf.sourceType=@s2 and tuf.favoritesId=ufa.id) as isFav from tb_question q, tb_user u where q.questionId=@q3 and q.userId=u.userId");
+			sql.setEntity(dao().getEntity(Question.class));
 			sql.params().set("q1", questionId);
 			sql.params().set("s1", KbbConstants.SourceType.QUESTION.getValue());
 			sql.params().set("u1", userId);
@@ -151,8 +157,9 @@ public class QuestionService extends EntityService<Question> {
 			}
 		};
 		
-		Sql sql = Sqls.create("select a.*,u.userName, u.reputationCount from tb_answers a, tb_user u where a.questionId=@q1 and a.userId=u.userId");
+		Sql sql = Sqls.create("select a.*,u.userName, u.reputationCount, u.imageUrl from tb_answers a, tb_user u where a.questionId=@q1 and a.userId=u.userId");
 		sql.params().set("q1", questionId);
+		sql.setEntity(dao().getEntity(Answers.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
 		return new Pagination<AnswerVo>(pageNum, pageSize, 0, sql.getList(AnswerVo.class));

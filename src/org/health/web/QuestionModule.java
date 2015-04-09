@@ -7,21 +7,19 @@
  */
 package org.health.web;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.health.common.page.Pagination;
 import org.health.model.Question;
 import org.health.service.QuestionService;
+import org.health.vo.AnswerVo;
+import org.health.vo.QuestionDetailVo;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
-import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 
 /**
@@ -31,51 +29,44 @@ import org.nutz.mvc.annotation.Ok;
  */
 @IocBean
 public class QuestionModule {
-	Log log = Logs.getLog(QuestionModule.class);
+	Log log = Logs.getLog(MainModule.class);
 	final int pageSize = 20;
+	
 	@Inject
 	private QuestionService questionService;
 	
 	@At("/question/*")
 	@Ok("jsp:jsp.question.questions")
-	public void doQuestionList(String type, int page, HttpServletRequest req){
-		if(!Strings.isEmpty(type)) {
-			if(page<=0){
-				page = 1;
-			}
-			if("newest".equals(type)) {
-				Pagination<Question> pgs = this.questionService.getQuestionByNews(page, pageSize);
-				req.setAttribute("pgs", pgs);
-				
-			} else if("hottest".equals(type)) {
-				
-			} else if("unanswered".equals(type)) {
-				
-			}
+	public void doQuestions(String type, int page, HttpServletRequest req) {
+		if(Strings.isEmpty(type)){
+			type = "newest";
 		}
-		
-		
+		if(page<=0){
+			page = 1;
+		}
+		if("newest".equals(type)) {
+			Pagination<Question> pgs = this.questionService.getQuestionByNews(page, pageSize);
+			req.setAttribute("pagination", pgs);
+		}else if("hottest".equals(type)) {
+			Pagination<Question> pgs = this.questionService.getQuestionByHot(page, pageSize);
+			req.setAttribute("pagination", pgs);
+		}else if("unanswered".equals(type)) {
+			Pagination<Question> pgs = this.questionService.getQuestionByUnanswered(page, pageSize);
+			req.setAttribute("pagination", pgs);
+		}
 	}
 	
-	@At("/hello")
-    @Ok("jsp:jsp.hello")
-    public String doHello() {
-		Pagination<Question> page = this.questionService.getQuestionByNews(1, 20);
-		System.out.println(page.getList().size());
-		log.debug("hello nutz.");
-        return "Hello Nutz ^_^";
-    }
-	
-	@At("/say")
-	@Ok("jsp:jsp.sayhello")
-//	@Fail("jsp:jsp.error")
-	@Fail("http:500")
-	public void doSayHello(HttpServletRequest req) {
-		Map<String, String> values = new HashMap<String, String>();
-		values.put("name", "jjj");
-		values.put("age", "12");
-		req.setAttribute("map", values);
-		req.setAttribute("name", "jhf");
+	@At("/q/?")
+	@Ok("jsp:jsp.question.detail")
+	public void doQuestionDetail(String id, HttpServletRequest req) {
+		QuestionDetailVo vo =  this.questionService.getQuestionDetail(id, null);
+		req.setAttribute("detailVo", vo);
+		
+		Pagination<AnswerVo> ansPg = this.questionService.getAnswersByQuestion(id, 1, pageSize);
+		req.setAttribute("ansPg", ansPg);
 	}
+	
+	
+	
 
 }

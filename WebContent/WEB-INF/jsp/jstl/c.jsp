@@ -1,5 +1,5 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ include file="/WEB-INF/jsp/head.jsp" %>
+<%@ page contentType="text/html; charset=UTF-8"%>
+<%@include file="/WEB-INF/jsp/head.jsp" %>
 <html>
 <head>
 <title>JSTL核心标签库 C</title>
