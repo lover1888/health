@@ -17,6 +17,7 @@ import org.health.model.Question;
 import org.health.service.QuestionService;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
@@ -29,12 +30,32 @@ import org.nutz.mvc.annotation.Ok;
  * @date 2015年4月8日 下午2:41:08
  */
 @IocBean
-@At("/q")
 public class QuestionModule {
-	Log log = Logs.getLog(MainModule.class);
-	
+	Log log = Logs.getLog(QuestionModule.class);
+	final int pageSize = 20;
 	@Inject
 	private QuestionService questionService;
+	
+	@At("/question/*")
+	@Ok("jsp:jsp.question.questions")
+	public void doQuestionList(String type, int page, HttpServletRequest req){
+		if(!Strings.isEmpty(type)) {
+			if(page<=0){
+				page = 1;
+			}
+			if("newest".equals(type)) {
+				Pagination<Question> pgs = this.questionService.getQuestionByNews(page, pageSize);
+				req.setAttribute("pgs", pgs);
+				
+			} else if("hottest".equals(type)) {
+				
+			} else if("unanswered".equals(type)) {
+				
+			}
+		}
+		
+		
+	}
 	
 	@At("/hello")
     @Ok("jsp:jsp.hello")
