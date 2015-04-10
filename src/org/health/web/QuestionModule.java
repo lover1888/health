@@ -38,63 +38,67 @@ import org.nutz.mvc.view.ViewWrapper;
 public class QuestionModule {
 	Log log = Logs.getLog(MainModule.class);
 	final int pageSize = 20;
-	
+
 	@Inject
 	private QuestionService questionService;
-	
+
 	@At("/question/*")
 	@Ok("jsp:jsp.question.questions")
 	public void doGetQuestions(String type, int page, HttpServletRequest req) {
-		if(Strings.isEmpty(type)){
+		if (Strings.isEmpty(type)) {
 			type = "newest";
 		}
-		if(page<=0){
+		if (page <= 0) {
 			page = 1;
 		}
-		if("newest".equals(type)) {
-			Pagination<Question> pgs = this.questionService.getQuestionByNews(page, pageSize);
+		if ("newest".equals(type)) {
+			Pagination<Question> pgs = this.questionService.getQuestionByNews(
+					page, pageSize);
 			req.setAttribute("pagination", pgs);
-		}else if("hottest".equals(type)) {
-			Pagination<Question> pgs = this.questionService.getQuestionByHot(page, pageSize);
+		} else if ("hottest".equals(type)) {
+			Pagination<Question> pgs = this.questionService.getQuestionByHot(
+					page, pageSize);
 			req.setAttribute("pagination", pgs);
-		}else if("unanswered".equals(type)) {
-			Pagination<Question> pgs = this.questionService.getQuestionByUnanswered(page, pageSize);
+		} else if ("unanswered".equals(type)) {
+			Pagination<Question> pgs = this.questionService
+					.getQuestionByUnanswered(page, pageSize);
 			req.setAttribute("pagination", pgs);
 		}
 	}
-	
+
 	@At("/question/ask")
 	@Ok("jsp:jsp.question.ask")
-	public void doAskQuestion(){
+	public void doAskQuestion() {
 	}
-	
+
 	@At("/question/askAct")
 	@Ok("redirect:/question")
-	public void doAskQuestionAct(@Param("..") Question question){
+	public void doAskQuestionAct(@Param("..") Question question) {
 		question.setQuestionId(KbbUtils.generateID());
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		question.setUserId(userId);
 		this.questionService.saveQuestion(question);
 	}
-	
-	
+
 	@At("/q/?")
 	@Ok("jsp:jsp.question.detail")
 	public void doGetQuestionDetail(String id, HttpServletRequest req) {
-		QuestionDetailVo vo =  this.questionService.getQuestionDetail(id, null);
+		QuestionDetailVo vo = this.questionService.getQuestionDetail(id, null);
 		req.setAttribute("detailVo", vo);
-		
-		Pagination<AnswerVo> ansPg = this.questionService.getAnswersByQuestion(id, 1, pageSize);
+
+		Pagination<AnswerVo> ansPg = this.questionService.getAnswersByQuestion(
+				id, 1, pageSize);
 		req.setAttribute("ansPg", ansPg);
 	}
-	
+
 	@At("/q/answer")
-//	@Ok("redirect:/q/${obj.questionId}")
-	public View doQuestionAnswer(@Param("..") Answers answer){
+	// @Ok("redirect:/q/${obj.questionId}")
+	public View doQuestionAnswer(@Param("..") Answers answer) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
 		System.out.println(answer.getQuestionId());
-	 return new ViewWrapper(new ServerRedirectView("/q/"+answer.getQuestionId()),null);
+		return new ViewWrapper(new ServerRedirectView("/q/"
+				+ answer.getQuestionId()), null);
 	}
-	
+
 }
