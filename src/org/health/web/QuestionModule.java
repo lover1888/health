@@ -9,9 +9,13 @@ package org.health.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.health.common.page.Pagination;
 import org.health.model.Question;
 import org.health.service.QuestionService;
+import org.health.util.KbbConstants;
+import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.ioc.loader.annotation.Inject;
@@ -21,6 +25,7 @@ import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
+import org.nutz.mvc.annotation.Param;
 
 /**
  * @Description TODO
@@ -37,7 +42,7 @@ public class QuestionModule {
 	
 	@At("/question/*")
 	@Ok("jsp:jsp.question.questions")
-	public void doQuestions(String type, int page, HttpServletRequest req) {
+	public void doGetQuestions(String type, int page, HttpServletRequest req) {
 		if(Strings.isEmpty(type)){
 			type = "newest";
 		}
@@ -58,7 +63,7 @@ public class QuestionModule {
 	
 	@At("/q/?")
 	@Ok("jsp:jsp.question.detail")
-	public void doQuestionDetail(String id, HttpServletRequest req) {
+	public void doGetQuestionDetail(String id, HttpServletRequest req) {
 		QuestionDetailVo vo =  this.questionService.getQuestionDetail(id, null);
 		req.setAttribute("detailVo", vo);
 		
@@ -66,7 +71,20 @@ public class QuestionModule {
 		req.setAttribute("ansPg", ansPg);
 	}
 	
+	@At("/question/ask")
+	@Ok("jsp:jsp.question.ask")
+	public void doAskQuestion(){
+		
+	}
 	
+	@At("/question/askAct")
+	@Ok("redirect:/question")
+	public void doAskQuestionAct(@Param("..") Question question){
+		question.setQuestionId(KbbUtils.generateID());
+		Subject subject = SecurityUtils.getSubject();
+		String userId = (String)subject.getSession().getAttribute(KbbConstants.SESSION_USER_ID);
+		question.setUserId(userId);
+		this.questionService.saveQuestion(question);
+	}
 	
-
 }

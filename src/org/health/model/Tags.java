@@ -9,6 +9,7 @@ package org.health.model;
 
 import java.util.Date;
 
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -18,29 +19,14 @@ import org.nutz.dao.entity.annotation.Table;
  */
 @Table("tb_tags")
 public class Tags {
-
-	private String tagId;
+	@Name
 	private String tagName;
 	private String tagType;
-	private Date createDate;
-	private Date updateDate;
+	private Date createDate = new Date();
+	private Date updateDate = new Date();
 	private String tagDescribe;
 	private int focusCount;
 
-	/**
-	 * @return the tagId
-	 */
-	public String getTagId() {
-		return tagId;
-	}
-
-	/**
-	 * @param tagId
-	 *            the tagId to set
-	 */
-	public void setTagId(String tagId) {
-		this.tagId = tagId;
-	}
 
 	/**
 	 * @return the tagName

@@ -7,7 +7,10 @@
  */
 package org.health.model;
 
+import java.util.List;
+
 import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -21,6 +24,23 @@ public class Role {
 	private int id;
 	private String roleName;
 	private String roleDescribe;
+	
+	@ManyMany(target=Permissions.class, relation="tb_role_permissions", from="roleId", to="permissionId")
+	private List<Permissions> permissions;
+
+	/**  
+	 * @return the permissions  
+	 */
+	public List<Permissions> getPermissions() {
+		return permissions;
+	}
+
+	/**  
+	 * @param permissions the permissions to set  
+	 */
+	public void setPermissions(List<Permissions> permissions) {
+		this.permissions = permissions;
+	}
 
 	/**
 	 * @return the id

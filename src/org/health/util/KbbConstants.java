@@ -14,6 +14,8 @@ package org.health.util;
  */
 public class KbbConstants {
 	
+	public static String SESSION_USER_ID = "userId"; 
+	
 	/**
 	 * 资源类型
 	 * @Description TODO

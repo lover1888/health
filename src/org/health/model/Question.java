@@ -29,8 +29,8 @@ public class Question {
 	private String tags;
 	private String content;
 	private String userId;
-	private Date createDate;
-	private Date updateDate;
+	private Date createDate = new Date();
+	private Date updateDate = new Date();
 	private int viewCount;
 	private int answersCount;
 	private int voteCount;

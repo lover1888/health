@@ -10,16 +10,21 @@ package org.health.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.health.common.page.Pagination;
 import org.health.model.Answers;
 import org.health.model.Comments;
 import org.health.model.Question;
+import org.health.model.Tags;
+import org.health.model.User;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
 import org.health.vo.QuestionDetailVo;
+import org.nutz.aop.interceptor.ioc.TransAop;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
 import org.nutz.dao.entity.Entity;
@@ -27,6 +32,7 @@ import org.nutz.dao.impl.sql.callback.EntityCallback;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Sql;
 import org.nutz.dao.sql.SqlContext;
+import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.service.EntityService;
@@ -182,9 +188,32 @@ public class QuestionService extends EntityService<Question> {
 	 * @param question
 	 * @return
 	 */
+	@Aop(TransAop.READ_COMMITTED)
 	public boolean saveQuestion(Question question) {
 		question.setQuestionId(KbbUtils.generateID());
 		Question q = dao().insert(question);
+		String[] tags = question.getTags().split(",");
+		List<Tags> list = dao().query(Tags.class, Cnd.where("tagName", "in", "\""+question.getTags()+"\""));
+		Set<String> tsets = new HashSet<String>();
+		for(Tags tag:list){
+			tsets.add(tag.getTagName());
+		}
+		list = new ArrayList<Tags>();
+		for(String t:tags){
+			if(!tsets.contains(t)){
+				Tags tag = new Tags();
+				tag.setTagName(t);
+				list.add(tag);
+			}
+		}
+		User u = new User();
+		u.setUserId(question.getUserId());
+		u.setTags(list);
+		dao().insertLinks(u, "tags");
+//		if(list.size()>0){
+//			dao().insert(list.toArray(new Tags[0]));
+//		}
+		
 		return q!=null;
 	}
 	

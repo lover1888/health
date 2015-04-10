@@ -7,6 +7,7 @@
  */
 package org.health.web;
 
+import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.IocBy;
 import org.nutz.mvc.annotation.Modules;
 import org.nutz.mvc.annotation.SetupBy;
@@ -25,6 +26,7 @@ import org.nutz.mvc.ioc.provider.ComboIocProvider;
 			 "org.health.service",
 			 "org.health.web"})
 @SetupBy(AppStartup.class)
+@Fail("jsp:jsp.error")
 public class MainModule {
 
 }

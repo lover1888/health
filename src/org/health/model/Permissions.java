@@ -21,6 +21,8 @@ public class Permissions {
 	private int id;
 	private String permissionName;
 	private String permissionDescribe;
+	private int needReputation;
+	private boolean isOnlySelf;
 
 	/**
 	 * @return the id
@@ -65,6 +67,36 @@ public class Permissions {
 	 */
 	public void setPermissionDescribe(String permissionDescribe) {
 		this.permissionDescribe = permissionDescribe;
+	}
+
+	/**
+	 * @return the needReputation
+	 */
+	public int getNeedReputation() {
+		return needReputation;
+	}
+
+	/**
+	 * @param needReputation
+	 *            the needReputation to set
+	 */
+	public void setNeedReputation(int needReputation) {
+		this.needReputation = needReputation;
+	}
+
+	/**
+	 * @return the isOnlySelf
+	 */
+	public boolean isOnlySelf() {
+		return isOnlySelf;
+	}
+
+	/**
+	 * @param isOnlySelf
+	 *            the isOnlySelf to set
+	 */
+	public void setOnlySelf(boolean isOnlySelf) {
+		this.isOnlySelf = isOnlySelf;
 	}
 
 }

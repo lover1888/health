@@ -6,6 +6,7 @@
 <title>登录</title>
 </head>
 <body>
+<h2><c:if test="${not empty errmsg }">出错啦：${errmsg }</c:if></h2>
 <form action="<c:url value='/loginAct' />" method="post">
 	<table>
 		<tr>

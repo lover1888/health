@@ -8,8 +8,12 @@
 package org.health.model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
-import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.ManyMany;
+import org.nutz.dao.entity.annotation.Name;
+import org.nutz.dao.entity.annotation.Readonly;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -21,7 +25,7 @@ import org.nutz.dao.entity.annotation.Table;
 @Table("tb_user")
 public class User {
 
-	@Id
+	@Name
 	private String userId;
 
 	private String userName;
@@ -47,6 +51,30 @@ public class User {
 	private String personName;
 	private int flag;
 	private String password;
+	
+	@ManyMany(target=Role.class, relation="tb_user_role", from="userId", to="roleId")
+	private List<Role> roles;
+	
+	@Readonly
+	private Set<Permissions> permissions;
+	
+	@ManyMany(target=Tags.class, relation="tb_user_tags", from="userId", to="tagName")
+	private List<Tags> tags;
+	
+
+	/**  
+	 * @return the tags  
+	 */
+	public List<Tags> getTags() {
+		return tags;
+	}
+
+	/**  
+	 * @param tags the tags to set  
+	 */
+	public void setTags(List<Tags> tags) {
+		this.tags = tags;
+	}
 
 	/**
 	 * @return the userId
@@ -393,4 +421,32 @@ public class User {
 		this.password = password;
 	}
 
+	/**  
+	 * @return the roles  
+	 */
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	/**  
+	 * @param roles the roles to set  
+	 */
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+	/**  
+	 * @return the permissions  
+	 */
+	public Set<Permissions> getPermissions() {
+		return permissions;
+	}
+
+	/**  
+	 * @param permissions the permissions to set  
+	 */
+	public void setPermissions(Set<Permissions> permissions) {
+		this.permissions = permissions;
+	}
+	
 }
