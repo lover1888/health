@@ -9,9 +9,8 @@ package org.health.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.health.common.page.Pagination;
+import org.health.model.Answers;
 import org.health.model.Question;
 import org.health.service.QuestionService;
 import org.health.util.KbbConstants;
@@ -23,9 +22,12 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
+import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.view.ServerRedirectView;
+import org.nutz.mvc.view.ViewWrapper;
 
 /**
  * @Description TODO
@@ -61,6 +63,21 @@ public class QuestionModule {
 		}
 	}
 	
+	@At("/question/ask")
+	@Ok("jsp:jsp.question.ask")
+	public void doAskQuestion(){
+	}
+	
+	@At("/question/askAct")
+	@Ok("redirect:/question")
+	public void doAskQuestionAct(@Param("..") Question question){
+		question.setQuestionId(KbbUtils.generateID());
+		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
+		question.setUserId(userId);
+		this.questionService.saveQuestion(question);
+	}
+	
+	
 	@At("/q/?")
 	@Ok("jsp:jsp.question.detail")
 	public void doGetQuestionDetail(String id, HttpServletRequest req) {
@@ -71,20 +88,13 @@ public class QuestionModule {
 		req.setAttribute("ansPg", ansPg);
 	}
 	
-	@At("/question/ask")
-	@Ok("jsp:jsp.question.ask")
-	public void doAskQuestion(){
-		
-	}
-	
-	@At("/question/askAct")
-	@Ok("redirect:/question")
-	public void doAskQuestionAct(@Param("..") Question question){
-		question.setQuestionId(KbbUtils.generateID());
-		Subject subject = SecurityUtils.getSubject();
-		String userId = (String)subject.getSession().getAttribute(KbbConstants.SESSION_USER_ID);
-		question.setUserId(userId);
-		this.questionService.saveQuestion(question);
+	@At("/q/answer")
+//	@Ok("redirect:/q/${obj.questionId}")
+	public View doQuestionAnswer(@Param("..") Answers answer){
+		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
+		answer.setUserId(userId);
+		System.out.println(answer.getQuestionId());
+	 return new ViewWrapper(new ServerRedirectView("/q/"+answer.getQuestionId()),null);
 	}
 	
 }

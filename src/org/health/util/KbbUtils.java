@@ -9,6 +9,9 @@ package org.health.util;
 
 import java.util.UUID;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
 /**
  * @Description TODO
  * @author jhengfei
@@ -23,6 +26,17 @@ public class KbbUtils {
 	 */
 	public static String generateID(){
 		return UUID.randomUUID().toString();
+	}
+	
+	/**
+	 * 从Session中取指定的值
+	 * @param key
+	 * @return
+	 */
+	public static String getSession(String key){
+		Subject subject = SecurityUtils.getSubject();
+		String userId = (String)subject.getSession().getAttribute(key);
+		return userId;
 	}
 	
 }

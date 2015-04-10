@@ -79,8 +79,6 @@ public class UserModule {
 	@Ok("jsp:jsp.user.user")
 	public void doUserMain(String userName, HttpServletRequest req) {
 		User user = this.userService.fetchUserInfo(userName);
-		
-		req.setAttribute("userName", userName);
 		req.setAttribute("user", user);
 		
 	}

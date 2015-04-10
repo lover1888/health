@@ -3,17 +3,16 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>${userName }--看病吧</title>
+<title>${user.userName }--看病吧</title>
 </head>
 <body>
-<h1>${userName }的信息</h1>
+<a href="<c:url value='/question'></c:url>">问题</a>
+
+<h1>${user.userName }的信息</h1>
 <hr>
-<h3>${userName }的标签</h3>
+<h3>${user.userName }的标签</h3>
 <c:forEach items="${user.tags }" var="tag">
 	${tag.tagName }<br>
-
 </c:forEach>
-
-
 </body>
 </html>

@@ -30,8 +30,8 @@ public class Answers {
 	private String userId;
 	
 	private String content;
-	private Date createDate;
-	private Date updateDate;
+	private Date createDate = new Date();
+	private Date updateDate = new Date();
 	private int voteCount;
 	private int commentCount;
 	private boolean isAdoption;

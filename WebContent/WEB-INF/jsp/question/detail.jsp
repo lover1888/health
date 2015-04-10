@@ -52,6 +52,12 @@ ${detailVo.question.answersCount }个回答
 	</c:forEach>
 	
 </table>
-
+<hr>
+<h3>撰写答案</h3>
+<form action="<c:url value='/q/answer'></c:url>" method="post">
+<textarea rows="10" cols="50" name="content"></textarea>
+<input type="hidden" name="questionId" value="${detailVo.question.questionId }"><br><br>
+<input type="submit" value="提交回答">
+</form>
 </body>
 </html>
