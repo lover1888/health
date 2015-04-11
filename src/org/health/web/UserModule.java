@@ -80,7 +80,6 @@ public class UserModule {
 	public void doUserMain(String userName, HttpServletRequest req) {
 		User user = this.userService.fetchUserInfo(userName);
 		req.setAttribute("user", user);
-		
 	}
 
 }

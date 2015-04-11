@@ -39,4 +39,8 @@ public class KbbUtils {
 		return userId;
 	}
 	
+	public static String getCurrentUserId(){
+		return getSession(KbbConstants.SESSION_USER_ID);
+	}
+	
 }

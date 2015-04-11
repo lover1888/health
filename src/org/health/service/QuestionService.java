@@ -10,16 +10,22 @@ package org.health.service;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.health.common.page.Pagination;
 import org.health.model.Answers;
 import org.health.model.Comments;
 import org.health.model.Question;
+import org.health.model.Reputation;
+import org.health.model.ReputationStrategy;
 import org.health.model.Tags;
 import org.health.model.User;
+import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
@@ -34,6 +40,7 @@ import org.nutz.dao.sql.Sql;
 import org.nutz.dao.sql.SqlContext;
 import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.service.EntityService;
 
@@ -135,16 +142,14 @@ public class QuestionService extends EntityService<Question> {
 		}
 		sql.setCallback(callback);
 		dao().execute(sql);
+		
+		// 问题浏览数增加
+		// TODO
+		
 		return sql.getObject(QuestionDetailVo.class);
 	}
 	
 	public Pagination<AnswerVo> getAnswersByQuestion(String questionId, int pageNum, int pageSize) {
-//		Trans.exec(Connection.TRANSACTION_READ_COMMITTED, new Atom(){
-//			@Override
-//			public void run() {
-//			}
-//		});
-		
 		EntityCallback callback = new EntityCallback(){
 			@Override
 			protected List<AnswerVo> process(ResultSet rs, Entity<?> entity,
@@ -183,7 +188,7 @@ public class QuestionService extends EntityService<Question> {
 	}
 	
 	/**
-	 * 保存问题
+	 * 提问题
 	 * @Description TODO
 	 * @param question
 	 * @return
@@ -218,6 +223,186 @@ public class QuestionService extends EntityService<Question> {
 	}
 	
 	/**
+	 * 回答问题
+	 */
+	@Aop(TransAop.READ_COMMITTED)
+	public boolean answerQuestion(Answers answers) {
+		/*
+			1插入数据到回答表
+			2更新问题表中的回答数
+			3插入回答问题声望记录\问题被回答声望记录
+			如果是回答自己的问题不加分
+			为关注该问题的人增加通知消息
+		 */
+		//插入数据到回答表
+		answers.setAnswersId(KbbUtils.generateID());
+		Answers ans = dao().insert(answers);
+		ans = dao().fetchLinks(ans, "question");
+		
+		//更新问题表中的回答数 
+		Question question = ans.getQuestion();
+		question.setAnswersCount(question.getAnswersCount()+1);
+		dao().update(question);
+		
+		// 获取声望策略
+		Map<String, Integer> maps = getReputationStrategy();
+		
+		// 声望不记录自问自答
+		if(!ans.getQuestion().getUserId().equals(ans.getUserId())){
+			List<Reputation> repus = new ArrayList<Reputation>();
+			// 回答问题声望记录
+			Reputation repu = new Reputation();
+			repu.setId(KbbUtils.generateID());
+			repu.setReputationType(KbbConstants.Stragety_AnswerQuestion);
+			repu.setSourceId(ans.getQuestionId());
+			repu.setSourceTitle(ans.getQuestion().getTitle());
+			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			repu.setUserId(ans.getUserId());
+			repu.setValue(maps.get(KbbConstants.Stragety_AnswerQuestion));	
+			repu.setAnswersId(ans.getAnswersId());
+			repus.add(repu);
+		
+			// 问题被回答声望记录
+			Reputation repu2 = new Reputation();
+			repu2.setId(KbbUtils.generateID());
+			repu2.setReputationType(KbbConstants.Stragety_QuestionBeAnswer);
+			repu2.setSourceId(ans.getQuestionId());
+			repu2.setSourceTitle(ans.getQuestion().getTitle());
+			repu2.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			repu2.setUserId(ans.getQuestion().getUserId());
+			repu2.setValue(maps.get(KbbConstants.Stragety_QuestionBeAnswer));	
+			repu2.setAnswersId(ans.getAnswersId());
+			repus.add(repu2);
+			// 插入声望记录
+			dao().insert(repus);
+			
+			// 更新用户声望记录，自问自答的不累积声望值
+			// 问题被回答人的声望
+			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", ans.getQuestion().getUserId()));
+			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_QuestionBeAnswer));
+			// 回答问题人的声望
+			User u2 = dao().fetch(User.class, Cnd.where("userId", "=", ans.getUserId()));
+			u2.setReputationCount(u2.getReputationCount()+maps.get(KbbConstants.Stragety_AnswerQuestion));
+			dao().update(Arrays.asList(u1,u2));
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * 对问题进行投票
+	 * @Description TODO
+	 * @param questionId 
+	 * @param voteType
+	 * @param userId 投票用户Id
+	 */
+	@Aop(TransAop.READ_COMMITTED)
+	public void voteQuestion(String questionId, String voteType, String userId){
+		Question q = dao().fetch(Question.class, Cnd.where("userId", "=", userId));
+		// 不能对自己投票
+		if(q.getUserId().equals(userId)){
+			throw Lang.makeThrow("不能对自己投票", new Object[0]);
+		}
+		// 检测是否已经投过票
+		UserVote uvote = dao().fetch(UserVote.class, Cnd.where("userId", "=", userId).and("sourceId","=","questionId").and("sourceType", "=", KbbConstants.SourceType.QUESTION.getValue()));
+		if(uvote!=null) {
+			throw Lang.makeThrow("您已经对问题投过票", new Object[0]);
+		}
+		// 获取声望策略
+		Map<String, Integer> maps = getReputationStrategy();
+		if(KbbConstants.VoteType_Add.equals(voteType)){
+			// 赞同票
+			Reputation repu = new Reputation();
+			repu.setId(KbbUtils.generateID());
+			repu.setReputationType(KbbConstants.Stragety_QuestionBeVoteAdd);
+			repu.setSourceId(q.getQuestionId());
+			repu.setSourceTitle(q.getTitle());
+			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			repu.setUserId(q.getUserId());
+			repu.setValue(maps.get(KbbConstants.Stragety_QuestionBeVoteAdd));
+			dao().insert(repu);
+			
+			// 更新用户声望数
+			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", q.getUserId()));
+			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_QuestionBeVoteAdd));
+			dao().update(u1);
+			
+			// 插入用户投票记录
+			UserVote uv = new UserVote();
+			uv.setId(KbbUtils.generateID());
+			uv.setSourceId(questionId);
+			uv.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			uv.setUserId(userId);
+			uv.setVoteType(KbbConstants.VoteType_Add);
+			dao().insert(uv);
+			
+			// 问题投票数增加
+			q.setVoteCount(q.getVoteCount()+1);
+			dao().update(q);
+			
+		} else if(KbbConstants.VoteType_Reduce.equals(voteType)){// 反对票
+			// 被反对
+			Reputation repu = new Reputation();
+			repu.setId(KbbUtils.generateID());
+			repu.setReputationType(KbbConstants.Stragety_QuestionBeVoteReduce);
+			repu.setSourceId(q.getQuestionId());
+			repu.setSourceTitle(q.getTitle());
+			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			repu.setUserId(q.getUserId());
+			repu.setValue(maps.get(KbbConstants.Stragety_QuestionBeVoteReduce));
+			//用户声望数
+			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", q.getUserId()));
+			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_QuestionBeVoteReduce));
+			
+			// 反对者
+			Reputation repu2 = new Reputation();
+			repu2.setId(KbbUtils.generateID());
+			repu2.setReputationType(KbbConstants.Stragety_QuestionVoteReduce);
+			repu2.setSourceId(q.getQuestionId());
+			repu2.setSourceTitle(q.getTitle());
+			repu2.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			repu2.setUserId(userId);
+			repu2.setValue(maps.get(KbbConstants.Stragety_QuestionVoteReduce));
+			// 更新用户声望
+			User u2 = dao().fetch(User.class, Cnd.where("userId", "=", userId));
+			u2.setReputationCount(u2.getReputationCount()+maps.get(KbbConstants.Stragety_QuestionVoteReduce));
+			
+			dao().insert(Arrays.asList(repu,repu2));
+			dao().update(Arrays.asList(u1,u2));
+			
+			// 插入用户投票记录
+			UserVote uv = new UserVote();
+			uv.setId(KbbUtils.generateID());
+			uv.setSourceId(questionId);
+			uv.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
+			uv.setUserId(userId);
+			uv.setVoteType(KbbConstants.VoteType_Reduce);
+			dao().insert(uv);
+			
+			// 问题投票数减少
+			q.setVoteCount(q.getVoteCount()-1);
+			dao().update(q);
+		} else {
+			throw Lang.makeThrow("未知的投票类型", new Object[0]);
+		}
+		
+	}
+	
+	
+	
+	// 获取声望策略
+	public Map<String, Integer> getReputationStrategy(){
+		List<ReputationStrategy> strategies = dao().query(ReputationStrategy.class, null);
+		Map<String, Integer> maps = new HashMap<String, Integer>();
+		for(ReputationStrategy stra:strategies) {
+			maps.put(stra.getStrategyName(), stra.getRelatedUserValue());
+		}
+		return maps;
+	}
+	
+	
+	
+	/**
 	 * 更新问题
 	 * @Description TODO
 	 * @param question
@@ -227,8 +412,5 @@ public class QuestionService extends EntityService<Question> {
 		int rlt = dao().update(question);
 		return rlt==1;
 	}
-	
-	
-	
 
 }

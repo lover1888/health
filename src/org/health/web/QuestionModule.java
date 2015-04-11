@@ -9,10 +9,14 @@ package org.health.web;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.subject.Subject;
 import org.health.common.page.Pagination;
 import org.health.model.Answers;
 import org.health.model.Question;
 import org.health.service.QuestionService;
+import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
@@ -26,6 +30,7 @@ import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.view.ForwardView;
 import org.nutz.mvc.view.ServerRedirectView;
 import org.nutz.mvc.view.ViewWrapper;
 
@@ -41,7 +46,11 @@ public class QuestionModule {
 
 	@Inject
 	private QuestionService questionService;
+	
+	@Inject
+	private StrategyService strategyService;
 
+	// 问题列表
 	@At("/question/*")
 	@Ok("jsp:jsp.question.questions")
 	public void doGetQuestions(String type, int page, HttpServletRequest req) {
@@ -66,11 +75,13 @@ public class QuestionModule {
 		}
 	}
 
+	
 	@At("/question/ask")
 	@Ok("jsp:jsp.question.ask")
 	public void doAskQuestion() {
 	}
 
+	// 提交问题
 	@At("/question/askAct")
 	@Ok("redirect:/question")
 	public void doAskQuestionAct(@Param("..") Question question) {
@@ -80,6 +91,7 @@ public class QuestionModule {
 		this.questionService.saveQuestion(question);
 	}
 
+	// 问题详情
 	@At("/q/?")
 	@Ok("jsp:jsp.question.detail")
 	public void doGetQuestionDetail(String id, HttpServletRequest req) {
@@ -91,14 +103,43 @@ public class QuestionModule {
 		req.setAttribute("ansPg", ansPg);
 	}
 
+	// 回答问题
 	@At("/q/answer")
-	// @Ok("redirect:/q/${obj.questionId}")
 	public View doQuestionAnswer(@Param("..") Answers answer) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
-		System.out.println(answer.getQuestionId());
+		this.questionService.answerQuestion(answer);
+		
 		return new ViewWrapper(new ServerRedirectView("/q/"
 				+ answer.getQuestionId()), null);
+	}
+	
+	// 问题投票（赞成，反对）
+	@At("/q/?/vote/?")
+	public View doVoteQuestion(String id, String type, HttpServletRequest req){
+		String msg = null;
+		// 检测投票是否有权限
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			if(KbbConstants.VoteType_Add.equals(type)){
+				subject.checkPermission("question:vote:add");	
+			} else if(KbbConstants.VoteType_Reduce.equals(type)){
+				subject.checkPermission("question:vote:reduce");
+			}
+		} catch (AuthorizationException e) {
+			msg = "您的声望值不够。";
+			return new ViewWrapper(new ServerRedirectView("/q/"
+					+ id), msg);
+		}
+		
+		try {
+			this.questionService.voteQuestion(id, type, KbbUtils.getCurrentUserId());
+			msg = "投票成功";
+		} catch (Exception e) {
+			msg = e.getMessage();
+		}
+		return new ViewWrapper(new ServerRedirectView("/q/"
+				+ id), msg);
 	}
 
 }

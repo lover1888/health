@@ -7,6 +7,7 @@
  */
 package org.health.model;
 
+import org.nutz.dao.entity.annotation.Id;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -18,9 +19,70 @@ import org.nutz.dao.entity.annotation.Table;
 @Table("tb_user_tags")
 public class UserTags {
 
-	private String id;
+	@Id
+	private Long id;
 	private String userId;
-	private String tagId;
-	private int value; 
-	
+	private String tagName;
+	private int value;
+
+	/**
+	 * @return the id
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId
+	 *            the userId to set
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the tagName
+	 */
+	public String getTagName() {
+		return tagName;
+	}
+
+	/**
+	 * @param tagName
+	 *            the tagName to set
+	 */
+	public void setTagName(String tagName) {
+		this.tagName = tagName;
+	}
+
+	/**
+	 * @return the value
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	public void setValue(int value) {
+		this.value = value;
+	}
+
 }

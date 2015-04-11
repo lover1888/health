@@ -9,7 +9,7 @@ package org.health.model;
 
 import java.util.Date;
 
-import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -20,13 +20,16 @@ import org.nutz.dao.entity.annotation.Table;
 @Table("tb_reputation")
 public class Reputation {
 
-	@Id
+	@Name
 	private String id;
-	private String actionType;
+	private String reputationType;
 	private String userId;
 	private int value;
 	private String sourceId;
-	private Date createDate;
+	private Date createDate = new Date();
+	private String sourceType;
+	private String answersId;
+	private String sourceTitle;
 
 	/**
 	 * @return the id
@@ -44,18 +47,63 @@ public class Reputation {
 	}
 
 	/**
-	 * @return the actionType
+	 * @return the reputationType
 	 */
-	public String getActionType() {
-		return actionType;
+	public String getReputationType() {
+		return reputationType;
 	}
 
 	/**
-	 * @param actionType
-	 *            the actionType to set
+	 * @param reputationType
+	 *            the reputationType to set
 	 */
-	public void setActionType(String actionType) {
-		this.actionType = actionType;
+	public void setReputationType(String reputationType) {
+		this.reputationType = reputationType;
+	}
+
+	/**
+	 * @return the sourceType
+	 */
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	/**
+	 * @param sourceType
+	 *            the sourceType to set
+	 */
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
+	/**
+	 * @return the answersId
+	 */
+	public String getAnswersId() {
+		return answersId;
+	}
+
+	/**
+	 * @param answersId
+	 *            the answersId to set
+	 */
+	public void setAnswersId(String answersId) {
+		this.answersId = answersId;
+	}
+
+	/**
+	 * @return the sourceTitle
+	 */
+	public String getSourceTitle() {
+		return sourceTitle;
+	}
+
+	/**
+	 * @param sourceTitle
+	 *            the sourceTitle to set
+	 */
+	public void setSourceTitle(String sourceTitle) {
+		this.sourceTitle = sourceTitle;
 	}
 
 	/**

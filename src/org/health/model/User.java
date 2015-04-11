@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.ManyMany;
 import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Readonly;
@@ -51,26 +52,62 @@ public class User {
 	private String personName;
 	private int flag;
 	private String password;
-	
-	@ManyMany(target=Role.class, relation="tb_user_role", from="userId", to="roleId")
+
+	@ManyMany(target = Role.class, relation = "tb_user_role", from = "userId", to = "roleId")
 	private List<Role> roles;
-	
+
 	@Readonly
 	private Set<Permissions> permissions;
-	
-	@ManyMany(target=Tags.class, relation="tb_user_tags", from="userId", to="tagName")
-	private List<Tags> tags;
-	
 
-	/**  
-	 * @return the tags  
+	@ManyMany(target = Tags.class, relation = "tb_user_tags", from = "userId", to = "tagName")
+	private List<Tags> tags;
+
+	@Many(target = UserTags.class, field = "userId")
+	private List<UserTags> userTags;
+
+	@Many(target = Reputation.class, field = "userId")
+	private List<Reputation> reputations;
+	
+	/**
+	 * @return the reputations
+	 */
+	public List<Reputation> getReputations() {
+		return reputations;
+	}
+
+	/**
+	 * @param reputations
+	 *            the reputations to set
+	 */
+	public void setReputations(List<Reputation> reputations) {
+		this.reputations = reputations;
+	}
+
+	/**
+	 * @return the userTags
+	 */
+	public List<UserTags> getUserTags() {
+		return userTags;
+	}
+
+	/**
+	 * @param userTags
+	 *            the userTags to set
+	 */
+	public void setUserTags(List<UserTags> userTags) {
+		this.userTags = userTags;
+	}
+
+	/**
+	 * @return the tags
 	 */
 	public List<Tags> getTags() {
 		return tags;
 	}
 
-	/**  
-	 * @param tags the tags to set  
+	/**
+	 * @param tags
+	 *            the tags to set
 	 */
 	public void setTags(List<Tags> tags) {
 		this.tags = tags;
@@ -421,32 +458,34 @@ public class User {
 		this.password = password;
 	}
 
-	/**  
-	 * @return the roles  
+	/**
+	 * @return the roles
 	 */
 	public List<Role> getRoles() {
 		return roles;
 	}
 
-	/**  
-	 * @param roles the roles to set  
+	/**
+	 * @param roles
+	 *            the roles to set
 	 */
 	public void setRoles(List<Role> roles) {
 		this.roles = roles;
 	}
 
-	/**  
-	 * @return the permissions  
+	/**
+	 * @return the permissions
 	 */
 	public Set<Permissions> getPermissions() {
 		return permissions;
 	}
 
-	/**  
-	 * @param permissions the permissions to set  
+	/**
+	 * @param permissions
+	 *            the permissions to set
 	 */
 	public void setPermissions(Set<Permissions> permissions) {
 		this.permissions = permissions;
 	}
-	
+
 }

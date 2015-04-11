@@ -38,7 +38,14 @@ public class UserService extends EntityService<User> {
 	}
 	
 	public User fetchUserInfo(String userName) {
-		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"tags");
+//		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"tags");
+		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"userTags");
+		user = dao().fetchLinks(user, "reputations");
+		return user;
+	}
+	
+	public User fetchUserTags(String userName) {
+		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"userTags");
 		return user;
 	}
 	
@@ -70,4 +77,5 @@ public class UserService extends EntityService<User> {
 		dao().execute(sql);
 		return sql.getObject(User.class);
 	}
+
 }

@@ -9,7 +9,7 @@ package org.health.model;
 
 import java.util.Date;
 
-import org.nutz.dao.entity.annotation.Id;
+import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -19,10 +19,102 @@ import org.nutz.dao.entity.annotation.Table;
  */
 @Table("tb_user_vote")
 public class UserVote {
-	@Id
+	@Name
 	private String id;
 	private String userId;
 	private String sourceId;
 	private String sourceType;
-	private Date createDate;
+	private Date createDate = new Date();
+	private String voteType;
+
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the userId
+	 */
+	public String getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId
+	 *            the userId to set
+	 */
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	/**
+	 * @return the sourceId
+	 */
+	public String getSourceId() {
+		return sourceId;
+	}
+
+	/**
+	 * @param sourceId
+	 *            the sourceId to set
+	 */
+	public void setSourceId(String sourceId) {
+		this.sourceId = sourceId;
+	}
+
+	/**
+	 * @return the sourceType
+	 */
+	public String getSourceType() {
+		return sourceType;
+	}
+
+	/**
+	 * @param sourceType
+	 *            the sourceType to set
+	 */
+	public void setSourceType(String sourceType) {
+		this.sourceType = sourceType;
+	}
+
+	/**
+	 * @return the createDate
+	 */
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	/**
+	 * @param createDate
+	 *            the createDate to set
+	 */
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	/**
+	 * @return the voteType
+	 */
+	public String getVoteType() {
+		return voteType;
+	}
+
+	/**
+	 * @param voteType
+	 *            the voteType to set
+	 */
+	public void setVoteType(String voteType) {
+		this.voteType = voteType;
+	}
+
 }

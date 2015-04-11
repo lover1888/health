@@ -7,18 +7,25 @@
 </head>
 <body>
 <a href="<c:url value='/question' />">问答</a> > 问答详情
-<h1>${detailVo.question.title }</h1>
+
+<h2>??<c:if test="${not empty obj }">提示：${obj }</c:if></h2>
+
+<h1>标题：${detailVo.question.title }</h1>
 <table>
 	<tr>
 		<td>头像:${detailVo.imgUrl }</td>
-		<td>用户名:${detailVo.userName }</td>
+		<td>用户:<a href="<c:url value='/u/${detailVo.userName }'></c:url>">${detailVo.userName }</a></td>
 		<td>声望:${detailVo.reputation }</td>
 		<td>提问时间:<fmt:formatDate value="${detailVo.question.createDate }" pattern="MM/dd HH:mm"/> </td>
 	</tr>
 </table>
 <table>
 	<tr>
-		<td>投票:${detailVo.question.voteCount }</td>
+		<td>
+			<a href="<c:url value='/q/${detailVo.question.questionId }/vote/1'></c:url>">赞同</a><br>
+			${detailVo.question.voteCount }<br>
+			<a href="<c:url value='/q/${detailVo.question.questionId }/vote/0'></c:url>">反对</a>
+		</td>
 		<td>内容:${detailVo.question.content }</td>
 	</tr>
 	<tr>
@@ -38,7 +45,7 @@ ${detailVo.question.answersCount }个回答
 		<tr>
 			<td>投票:${ans.answers.voteCount }</td>
 			<td>
-			回答人:${ans.userName }&nbsp;&nbsp;声望:${ans.reputation }&nbsp;&nbsp;<fmt:formatDate value="${ans.answers.createDate }" pattern="MM/dd HH:mm"/> <br>
+			回答人:<a href="<c:url value='/u/${ans.userName }'></c:url>">${ans.userName }</a>&nbsp;&nbsp;声望:${ans.reputation }&nbsp;&nbsp;<fmt:formatDate value="${ans.answers.createDate }" pattern="MM/dd HH:mm"/> <br>
 			回答内容:${ ans.answers.content}
 			</td>
 			<td>头像:${ans.imgUrl }</td>
