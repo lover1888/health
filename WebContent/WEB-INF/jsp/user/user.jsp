@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>  
-<%@include file="/WEB-INF/jsp/head.jsp" %>
+<%@include file="/WEB-INF/jsp/taglib.jsp" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">

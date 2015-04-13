@@ -1,13 +1,31 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isErrorPage="true"%>  
-<%@include file="/WEB-INF/jsp/head.jsp" %>
+<%@include file="/WEB-INF/jsp/taglib.jsp" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>看病吧--问答详情</title>
+<script src="${baseURI }/js/jquery-1.10.2.js"></script>
+<link rel="stylesheet" href="${baseURI }/css/ui-dialog.css">
+<script src="${baseURI }/js/dialog.js"></script>
 </head>
 <body>
 <a href="<c:url value='/question' />">问答</a> > 问答详情
-
+<script type="text/javascript">
+	function test() {
+		var d = dialog({
+		    title: '欢迎',
+		    content: '欢迎使用 artDialog 对话框组件！',
+		    okValue: '确定',
+		    ok: function() {
+		    	this.title('投票中...');
+		    	return false;
+		    },
+			cancelValue: '取消',
+			cancel: function() {}
+		});
+		d.showModal();
+	}
+</script>
 <h2>??<c:if test="${not empty obj }">提示：${obj }</c:if></h2>
 
 <h1>标题：${detailVo.question.title }</h1>
@@ -19,6 +37,7 @@
 		<td>提问时间:<fmt:formatDate value="${detailVo.question.createDate }" pattern="MM/dd HH:mm"/> </td>
 	</tr>
 </table>
+<a href="#" onclick="test();">测试</a>
 <table>
 	<tr>
 		<td>
