@@ -40,7 +40,7 @@ public class UserService extends EntityService<User> {
 	public User fetchUserInfo(String userName) {
 //		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"tags");
 		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"userTags");
-		user = dao().fetchLinks(user, "reputations");
+		user = dao().fetchLinks(user, "reputations",Cnd.orderBy().desc("createDate"));
 		return user;
 	}
 	

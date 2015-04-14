@@ -30,7 +30,6 @@ import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.nutz.mvc.view.ForwardView;
 import org.nutz.mvc.view.ServerRedirectView;
 import org.nutz.mvc.view.ViewWrapper;
 
@@ -114,9 +113,10 @@ public class QuestionModule {
 				+ answer.getQuestionId()), null);
 	}
 	
-	// 问题投票（赞成，反对）
+	// 问题投票（赞成，反对）用Ajax调用
 	@At("/q/?/vote/?")
-	public View doVoteQuestion(String id, String type, HttpServletRequest req){
+	@Ok("json")
+	public String doVoteQuestion(String id, String type, HttpServletRequest req){
 		String msg = null;
 		// 检测投票是否有权限
 		try {
@@ -128,8 +128,7 @@ public class QuestionModule {
 			}
 		} catch (AuthorizationException e) {
 			msg = "您的声望值不够。";
-			return new ViewWrapper(new ServerRedirectView("/q/"
-					+ id), msg);
+			return msg;
 		}
 		
 		try {
@@ -138,8 +137,8 @@ public class QuestionModule {
 		} catch (Exception e) {
 			msg = e.getMessage();
 		}
-		return new ViewWrapper(new ServerRedirectView("/q/"
-				+ id), msg);
+		return msg;
 	}
+	
 
 }

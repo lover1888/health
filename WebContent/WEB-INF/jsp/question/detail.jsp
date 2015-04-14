@@ -11,23 +11,33 @@
 <body>
 <a href="<c:url value='/question' />">问答</a> > 问答详情
 <script type="text/javascript">
-	function test() {
-		var d = dialog({
-		    title: '欢迎',
-		    content: '欢迎使用 artDialog 对话框组件！',
-		    okValue: '确定',
-		    ok: function() {
-		    	this.title('投票中...');
-		    	return false;
-		    },
-			cancelValue: '取消',
-			cancel: function() {}
-		});
-		d.showModal();
+	function vote(urlStr,contentStr){
+		var vdialog = dialog({
+			title: '提示',
+			content: contentStr,
+			okVal: '确定',
+			ok: function() {
+				this.content('投票中，请稍等...');
+				$.ajax({
+					url:urlStr,
+					success:function(data){
+						var td = dialog({
+							title:'提示',
+							content: data
+						});
+						td.show();
+						setTimeout(function(){
+							td.close().remove();
+						},2000);
+					}
+				});
+			},
+			cancelVal: '取消',
+			cancel: true
+		}); 
+		vdialog.showModal();
 	}
 </script>
-<h2>??<c:if test="${not empty obj }">提示：${obj }</c:if></h2>
-
 <h1>标题：${detailVo.question.title }</h1>
 <table>
 	<tr>
@@ -37,13 +47,12 @@
 		<td>提问时间:<fmt:formatDate value="${detailVo.question.createDate }" pattern="MM/dd HH:mm"/> </td>
 	</tr>
 </table>
-<a href="#" onclick="test();">测试</a>
 <table>
 	<tr>
 		<td>
-			<a href="<c:url value='/q/${detailVo.question.questionId }/vote/1'></c:url>">赞同</a><br>
+			<a href="#" onclick="vote('${baseURI}/q/${detailVo.question.questionId }/vote/1','确认要为它投赞同票吗？');">赞同</a><br>
 			${detailVo.question.voteCount }<br>
-			<a href="<c:url value='/q/${detailVo.question.questionId }/vote/0'></c:url>">反对</a>
+			<a href="#" onclick="vote('${baseURI}/q/${detailVo.question.questionId }/vote/0','确认要为它投反对票吗？');">反对</a>
 		</td>
 		<td>内容:${detailVo.question.content }</td>
 	</tr>
@@ -62,7 +71,11 @@ ${detailVo.question.answersCount }个回答
 <table border="1">
 	<c:forEach items="${ansPg.list }" var="ans">
 		<tr>
-			<td>投票:${ans.answers.voteCount }</td>
+			<td>
+			<a href="#" onclick="vote('${baseURI}/answer/${ans.answers.answersId }/vote/1','确认要为它投赞同票吗？');">赞同</a><br>
+			${ans.answers.voteCount }<br>
+			<a href="#" onclick="vote('${baseURI}/answer/${ans.answers.answersId }/vote/0','确认要为它投反对票吗？');">反对</a>
+			</td>
 			<td>
 			回答人:<a href="<c:url value='/u/${ans.userName }'></c:url>">${ans.userName }</a>&nbsp;&nbsp;声望:${ans.reputation }&nbsp;&nbsp;<fmt:formatDate value="${ans.answers.createDate }" pattern="MM/dd HH:mm"/> <br>
 			回答内容:${ ans.answers.content}
@@ -74,7 +87,6 @@ ${detailVo.question.answersCount }个回答
 			<td><a href="#">评论</a> &nbsp;&nbsp;  <a href="#">举报</a></td>
 			<td></td>
 		</tr>
-		
 	</c:forEach>
 	
 </table>

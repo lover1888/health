@@ -25,6 +25,7 @@ import org.health.model.Reputation;
 import org.health.model.ReputationStrategy;
 import org.health.model.Tags;
 import org.health.model.User;
+import org.health.model.UserTags;
 import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
@@ -195,10 +196,18 @@ public class QuestionService extends EntityService<Question> {
 	 */
 	@Aop(TransAop.READ_COMMITTED)
 	public boolean saveQuestion(Question question) {
+		// 保存问题
 		question.setQuestionId(KbbUtils.generateID());
 		Question q = dao().insert(question);
+		// 更新标签
 		String[] tags = question.getTags().split(",");
-		List<Tags> list = dao().query(Tags.class, Cnd.where("tagName", "in", "\""+question.getTags()+"\""));
+		StringBuilder sb = new StringBuilder();
+		for(String tag:tags){
+			sb.append("\"").append(tag).append("\"").append(",");
+		}
+		String tmp = sb.toString();
+		tmp = tmp.substring(0, tmp.length()-1);
+		List<Tags> list = dao().query(Tags.class, Cnd.where("tagName", "in", tmp));
 		Set<String> tsets = new HashSet<String>();
 		for(Tags tag:list){
 			tsets.add(tag.getTagName());
@@ -209,15 +218,37 @@ public class QuestionService extends EntityService<Question> {
 				Tags tag = new Tags();
 				tag.setTagName(t);
 				list.add(tag);
-			}
+			} 
 		}
 		User u = new User();
 		u.setUserId(question.getUserId());
 		u.setTags(list);
+		// 添加新创建的标签以及用户关联标签表
 		dao().insertLinks(u, "tags");
-//		if(list.size()>0){
-//			dao().insert(list.toArray(new Tags[0]));
-//		}
+		
+		// 查找所有的用户已关联标签
+		u = dao().fetchLinks(u, "userTags");
+		List<UserTags> uts = u.getUserTags();
+		List<UserTags> unUts = new ArrayList<UserTags>();
+		UserTags utmp;
+		for(String tag:tags){
+			boolean isFlag = false;
+			for(UserTags ut:uts){
+				if(ut.getTagName().equals(tag)){
+					isFlag = true;
+					break;
+				}
+			}
+			if(!isFlag) {
+				// 如果没有关联标签则需要关联
+				utmp = new UserTags();
+				utmp.setUserId(u.getUserId());
+				utmp.setTagName(tag);
+				unUts.add(utmp);
+			}
+		}
+		u.setUserTags(unUts);
+		dao().insertLinks(u, "userTags");
 		
 		return q!=null;
 	}
@@ -232,6 +263,7 @@ public class QuestionService extends EntityService<Question> {
 			2更新问题表中的回答数
 			3插入回答问题声望记录\问题被回答声望记录
 			如果是回答自己的问题不加分
+			回答问题后会自动关注该问题
 			为关注该问题的人增加通知消息
 		 */
 		//插入数据到回答表
@@ -286,11 +318,55 @@ public class QuestionService extends EntityService<Question> {
 			dao().update(Arrays.asList(u1,u2));
 		}
 		
+		// 回答问题标签积分更新：
+		// 自问自答问题标签积分不累积
+		// 回答问题标签积分只记录第一次
+		if(!ans.getQuestion().getUserId().equals(ans.getUserId())){
+			int count = dao().count(Answers.class, Cnd.where("userId", "=", ans.getUserId()).and("questionId","=",ans.getQuestionId()));
+			if(count<2){
+				User u = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userId", "=", answers.getUserId())), "userTags");
+				String[] tags = question.getTags().split(",");
+				List<UserTags> uts = u.getUserTags();
+				List<UserTags> unUts = new ArrayList<UserTags>();
+				List<UserTags> updateTags = new ArrayList<UserTags>();
+				UserTags utmp;
+				for(String tag:tags){
+					UserTags tagFlag = null;
+					for(UserTags ut:uts){
+						if(ut.getTagName().equals(tag)){
+							tagFlag = ut;
+							break;
+						}
+					}
+					if(tagFlag==null) {
+						// 如果没有关联标签则需要关联
+						utmp = new UserTags();
+						utmp.setUserId(u.getUserId());
+						utmp.setTagName(tag);
+						utmp.setValue(1);
+						unUts.add(utmp);
+					} else {// 如果已关联标签则需要标签积分增加
+						tagFlag.setValue(tagFlag.getValue()+1);
+						updateTags.add(tagFlag);
+					}
+				}
+				if(unUts.size()>0){
+					u.setUserTags(unUts);
+					dao().insertLinks(u, "userTags");
+				}
+				if(updateTags.size()>0){
+					u.setUserTags(updateTags);
+					dao().updateLinks(u, "userTags");
+				}
+			}
+		}
+		
 		return true;
 	}
 	
 	/**
 	 * 对问题进行投票
+	 * 
 	 * @Description TODO
 	 * @param questionId 
 	 * @param voteType
@@ -298,13 +374,13 @@ public class QuestionService extends EntityService<Question> {
 	 */
 	@Aop(TransAop.READ_COMMITTED)
 	public void voteQuestion(String questionId, String voteType, String userId){
-		Question q = dao().fetch(Question.class, Cnd.where("userId", "=", userId));
-		// 不能对自己投票
+		Question q = dao().fetch(Question.class, Cnd.where("questionId", "=", questionId));
+		// 不能对自己的问题投票
 		if(q.getUserId().equals(userId)){
-			throw Lang.makeThrow("不能对自己投票", new Object[0]);
+			throw Lang.makeThrow("不能对自己的问题投票", new Object[0]);
 		}
 		// 检测是否已经投过票
-		UserVote uvote = dao().fetch(UserVote.class, Cnd.where("userId", "=", userId).and("sourceId","=","questionId").and("sourceType", "=", KbbConstants.SourceType.QUESTION.getValue()));
+		UserVote uvote = dao().fetch(UserVote.class, Cnd.where("userId", "=", userId).and("sourceId","=",questionId).and("sourceType", "=", KbbConstants.SourceType.QUESTION.getValue()));
 		if(uvote!=null) {
 			throw Lang.makeThrow("您已经对问题投过票", new Object[0]);
 		}
@@ -385,10 +461,7 @@ public class QuestionService extends EntityService<Question> {
 		} else {
 			throw Lang.makeThrow("未知的投票类型", new Object[0]);
 		}
-		
 	}
-	
-	
 	
 	// 获取声望策略
 	public Map<String, Integer> getReputationStrategy(){
@@ -398,19 +471,6 @@ public class QuestionService extends EntityService<Question> {
 			maps.put(stra.getStrategyName(), stra.getRelatedUserValue());
 		}
 		return maps;
-	}
-	
-	
-	
-	/**
-	 * 更新问题
-	 * @Description TODO
-	 * @param question
-	 * @return
-	 */
-	public boolean updateQuestion(Question question){
-		int rlt = dao().update(question);
-		return rlt==1;
 	}
 
 }
