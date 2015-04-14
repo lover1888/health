@@ -250,6 +250,10 @@ public class QuestionService extends EntityService<Question> {
 		u.setUserTags(unUts);
 		dao().insertLinks(u, "userTags");
 		
+		// 插入用户关注表
+		u.setFocusQuestions(Arrays.asList(q));
+		dao().insertRelation(u, "focusQuestions");
+		
 		return q!=null;
 	}
 	
@@ -360,7 +364,14 @@ public class QuestionService extends EntityService<Question> {
 				}
 			}
 		}
-		
+		// 插入关注表
+		User u = new User();
+		u.setUserId(ans.getUserId());
+		u = dao().fetchLinks(u, "focusQuestions", Cnd.where("userId", "=", ans.getUserId()).and("questionId", "=", ans.getQuestionId()));
+		if(u.getFocusQuestions().size()<1){
+			u.setFocusQuestions(Arrays.asList(ans.getQuestion()));
+			dao().insertRelation(u, "focusQuestions");
+		}		
 		return true;
 	}
 	

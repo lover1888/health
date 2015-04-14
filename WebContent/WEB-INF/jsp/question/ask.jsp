@@ -6,8 +6,8 @@
 <title>我要咨询</title>
 </head>
 <body>
+<%@ include file="/WEB-INF/jsp/top.jsp" %>
 <h1>提问题</h1>
-
 <form action="<c:url value='/question/askAct'></c:url>" method="post">
 	标题：<input type="text" name="title"><br><br>
 	标签：<input type="text" name="tags"><br><br>

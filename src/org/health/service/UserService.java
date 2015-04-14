@@ -41,6 +41,8 @@ public class UserService extends EntityService<User> {
 //		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"tags");
 		User user = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userName", "=", userName)),"userTags");
 		user = dao().fetchLinks(user, "reputations",Cnd.orderBy().desc("createDate"));
+		
+		user = dao().fetchLinks(user, "focusQuestions");
 		return user;
 	}
 	

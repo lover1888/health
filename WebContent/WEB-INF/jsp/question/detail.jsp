@@ -9,7 +9,8 @@
 <script src="${baseURI }/js/dialog.js"></script>
 </head>
 <body>
-<a href="<c:url value='/question' />">问答</a> > 问答详情
+<%@ include file="/WEB-INF/jsp/top.jsp" %>
+
 <script type="text/javascript">
 	function vote(urlStr,contentStr){
 		var vdialog = dialog({

@@ -65,9 +65,22 @@ public class User {
 	@Many(target = UserTags.class, field = "userId")
 	private List<UserTags> userTags;
 
+	// 声望记录
 	@Many(target = Reputation.class, field = "userId")
 	private List<Reputation> reputations;
 	
+	//关注的问题
+	@ManyMany(target = Question.class, relation="tb_focus_question", from="userId", to="questionId")
+	private List<Question> focusQuestions;
+	
+	public List<Question> getFocusQuestions() {
+		return focusQuestions;
+	}
+
+	public void setFocusQuestions(List<Question> focusQuestions) {
+		this.focusQuestions = focusQuestions;
+	}
+
 	/**
 	 * @return the reputations
 	 */
