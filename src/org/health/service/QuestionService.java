@@ -430,6 +430,8 @@ public class QuestionService extends EntityService<Question> {
 			// 问题投票数增加
 			q.setVoteAddCount(q.getVoteAddCount()+1);
 			dao().update(q);
+			// 更新标签得分??
+			ServiceUtils.updateUserTagsValue(q.getUserId(), q.getTags(), maps.get(KbbConstants.Stragety_QuestionBeVoteAdd), dao());
 			
 		} else if(KbbConstants.ActType_Reduce.equals(voteType)){// 反对票
 			// 被反对
@@ -444,6 +446,8 @@ public class QuestionService extends EntityService<Question> {
 			//用户声望数
 			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", q.getUserId()));
 			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_QuestionBeVoteReduce));
+			// 更新标签得分??
+			ServiceUtils.updateUserTagsValue(q.getUserId(), q.getTags(), maps.get(KbbConstants.Stragety_QuestionBeVoteReduce), dao());
 			
 			// 反对者
 			Reputation repu2 = new Reputation();
@@ -473,6 +477,7 @@ public class QuestionService extends EntityService<Question> {
 			// 问题投票数减少
 			q.setVoteReduceCount(q.getVoteReduceCount()+1);
 			dao().update(q);
+						
 		} else {
 			throw Lang.makeThrow("未知的投票类型", new Object[0]);
 		}

@@ -99,22 +99,6 @@ public class AnswerService extends EntityService<Answers> {
 				
 				// 给被采纳答案者更新标签积分
 				ServiceUtils.updateUserTagsValue(u2.getUserId(), q.getTags(), maps.get(KbbConstants.Stragety_AnswerBeAdopt), dao());
-//				u2 = dao().fetchLinks(u2, "userTags");
-//				List<UserTags> upds = new ArrayList<UserTags>();
-//				List<UserTags> utags = u2.getUserTags();
-//				String[] tgs = q.getTags().split(",");
-//				for(UserTags ut:utags){
-//					for(String tg:tgs){
-//						if(ut.getTagName().equals(tg)){
-//							ut.setValue(ut.getValue()+maps.get(KbbConstants.Stragety_AnswerBeAdopt));
-//							upds.add(ut);
-//							break;
-//						}
-//					}
-//				}
-//				if(upds.size()>0){
-//					dao().update(upds);
-//				}
 			}
 			
 			
@@ -160,22 +144,6 @@ public class AnswerService extends EntityService<Answers> {
 				
 				// 给被采纳答案者更新标签积分
 				ServiceUtils.updateUserTagsValue(u2.getUserId(), q.getTags(), -maps.get(KbbConstants.Stragety_AnswerBeAdopt), dao());
-//				u2 = dao().fetchLinks(u2, "userTags");
-//				List<UserTags> upds = new ArrayList<UserTags>();
-//				List<UserTags> utags = u2.getUserTags();
-//				String[] tgs = q.getTags().split(",");
-//				for(UserTags ut:utags){
-//					for(String tg:tgs){
-//						if(ut.getTagName().equals(tg)){
-//							ut.setValue(ut.getValue()-maps.get(KbbConstants.Stragety_AnswerBeAdopt));
-//							upds.add(ut);
-//							break;
-//						}
-//					}
-//				}
-//				if(upds.size()>0){
-//					dao().update(upds);
-//				}
 			}
 			
 		} 
