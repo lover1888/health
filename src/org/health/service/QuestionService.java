@@ -253,7 +253,9 @@ public class QuestionService extends EntityService<Question> {
 		// 插入用户关注表
 		u.setFocusQuestions(Arrays.asList(q));
 		dao().insertRelation(u, "focusQuestions");
-		
+		// 更新问题表中的关注数
+		q.setFocusCount(q.getFocusCount()+1);
+		dao().update(q);
 		return q!=null;
 	}
 	
@@ -371,7 +373,11 @@ public class QuestionService extends EntityService<Question> {
 		if(u.getFocusQuestions().size()<1){
 			u.setFocusQuestions(Arrays.asList(ans.getQuestion()));
 			dao().insertRelation(u, "focusQuestions");
-		}		
+		}
+		// 问题的关注数增加
+		question.setFocusCount(question.getFocusCount()+1);
+		dao().update(question);
+		
 		return true;
 	}
 	

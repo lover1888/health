@@ -39,13 +39,16 @@
 		vdialog.showModal();
 	}
 </script>
-<h1>标题：${detailVo.question.title }</h1>
+<h2>标题：${detailVo.question.title }</h2>
+&nbsp;&nbsp;<a href="">关注</a>&nbsp;&nbsp;${detailVo.question.focusCount }关注<br>
+&nbsp;&nbsp;<a href="">收藏</a>&nbsp;&nbsp;${detailVo.question.favoriteCount }收藏，${detailVo.question.viewCount }浏览
+
 <table>
-	<tr>
-		<td>头像:${detailVo.imgUrl }</td>
-		<td>用户:<a href="<c:url value='/u/${detailVo.userName }'></c:url>">${detailVo.userName }</a></td>
-		<td>声望:${detailVo.reputation }</td>
-		<td>提问时间:<fmt:formatDate value="${detailVo.question.createDate }" pattern="MM/dd HH:mm"/> </td>
+	<tr height="40">
+		<td>头像：${detailVo.imgUrl }</td>
+		<td>&nbsp;&nbsp;用户：<a href="<c:url value='/u/${detailVo.userName }'></c:url>">${detailVo.userName }</a></td>
+		<td>&nbsp;&nbsp;声望：${detailVo.reputation }</td>
+		<td>&nbsp;&nbsp;提问时间：<fmt:formatDate value="${detailVo.question.createDate }" pattern="MM/dd HH:mm"/> </td>
 	</tr>
 </table>
 <table>
@@ -57,7 +60,7 @@
 		</td>
 		<td>内容:${detailVo.question.content }</td>
 	</tr>
-	<tr>
+	<tr height="40">
 		<td></td>
 		<td>标签:${detailVo.question.tags}</td>
 	</tr>

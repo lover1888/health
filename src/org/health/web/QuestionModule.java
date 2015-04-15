@@ -140,5 +140,14 @@ public class QuestionModule {
 		return msg;
 	}
 	
+	@At("/q/?/focus")
+	@Ok("json")
+	public String doFocusQuestion(String questionId){
+		String rtnMsg = null;
+		
+		
+		return rtnMsg;
+	}
+	
 
 }
