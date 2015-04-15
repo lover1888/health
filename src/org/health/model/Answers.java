@@ -162,7 +162,7 @@ public class Answers {
 	/**
 	 * @return the isAdoption
 	 */
-	public boolean isAdoption() {
+	public boolean getIsAdoption() {
 		return isAdoption;
 	}
 
@@ -170,7 +170,7 @@ public class Answers {
 	 * @param isAdoption
 	 *            the isAdoption to set
 	 */
-	public void setAdoption(boolean isAdoption) {
+	public void setIsAdoption(boolean isAdoption) {
 		this.isAdoption = isAdoption;
 	}
 

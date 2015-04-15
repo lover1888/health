@@ -94,12 +94,15 @@ public class QuestionModule {
 	@At("/q/?")
 	@Ok("jsp:jsp.question.detail")
 	public void doGetQuestionDetail(String id, HttpServletRequest req) {
-		QuestionDetailVo vo = this.questionService.getQuestionDetail(id, null);
+		String userId = KbbUtils.getCurrentUserId();
+		QuestionDetailVo vo = this.questionService.getQuestionDetail(id, userId);
 		req.setAttribute("detailVo", vo);
 
 		Pagination<AnswerVo> ansPg = this.questionService.getAnswersByQuestion(
 				id, 1, pageSize);
 		req.setAttribute("ansPg", ansPg);
+		
+		req.setAttribute("currUserId", userId);
 	}
 
 	// 回答问题
@@ -121,9 +124,9 @@ public class QuestionModule {
 		// 检测投票是否有权限
 		try {
 			Subject subject = SecurityUtils.getSubject();
-			if(KbbConstants.VoteType_Add.equals(type)){
+			if(KbbConstants.ActType_Add.equals(type)){
 				subject.checkPermission("question:vote:add");	
-			} else if(KbbConstants.VoteType_Reduce.equals(type)){
+			} else if(KbbConstants.ActType_Reduce.equals(type)){
 				subject.checkPermission("question:vote:reduce");
 			}
 		} catch (AuthorizationException e) {
@@ -133,20 +136,35 @@ public class QuestionModule {
 		
 		try {
 			this.questionService.voteQuestion(id, type, KbbUtils.getCurrentUserId());
-			msg = "投票成功";
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			msg = e.getMessage();
+			return msg;
 		}
-		return msg;
+		return "投票成功";
 	}
 	
-	@At("/q/?/focus")
+	@At("/q/?/focus/?")
 	@Ok("json")
-	public String doFocusQuestion(String questionId){
+	public String doFocusQuestion(String questionId, String type){
 		String rtnMsg = null;
-		
-		
-		return rtnMsg;
+		// 是否已经关注
+		// 关注
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			subject.checkPermission("question:focus");
+		} catch (AuthorizationException e) {
+			rtnMsg = "您没有该权限";
+			return rtnMsg;
+		}
+		try {
+			this.questionService.focusQuestion(KbbUtils.getCurrentUserId(), questionId, type);
+		} catch (Exception e) {
+			rtnMsg = e.getMessage();
+			log.error(e.getMessage(), e);
+			return rtnMsg;
+		}
+		return "操作成功";
 	}
 	
 

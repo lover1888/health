@@ -19,7 +19,11 @@
 <c:forEach items="${pagination.list }" var="q">
 	<tr>
 		<td> ${q.voteCount} 投票</td>
-		<td>${q.answersCount }回答</td>
+		<td>${q.answersCount }回答
+			<c:if test="${q.questionStatus==2}">
+				<br>已解决
+			</c:if>
+		</td>
 		<td>${q.viewCount }浏览</td>
 		<td>
 		<a href="<c:url value='/q/${q.questionId }' /> ">${q.title}</a> 

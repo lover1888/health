@@ -39,6 +39,7 @@ public class Question {
 	private int commentCount;
 	private boolean isComplaints;
 	private int flag;
+	private int questionStatus;
 
 	private String lastActiveInfo;
 
@@ -298,6 +299,21 @@ public class Question {
 	 */
 	public void setLastActiveInfo(String lastActiveInfo) {
 		this.lastActiveInfo = lastActiveInfo;
+	}
+
+	/**
+	 * @return the questionStatus
+	 */
+	public int getQuestionStatus() {
+		return questionStatus;
+	}
+
+	/**
+	 * @param questionStatus
+	 *            the questionStatus to set
+	 */
+	public void setQuestionStatus(int questionStatus) {
+		this.questionStatus = questionStatus;
 	}
 
 }

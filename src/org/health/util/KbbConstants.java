@@ -19,11 +19,47 @@ public class KbbConstants {
 	/**
 	 * 投赞同票
 	 */
-	public static String VoteType_Add = "1";
+//	public static String VoteType_Add = "1";
 	/**
 	 * 投反对票
 	 */
-	public static String VoteType_Reduce = "0";
+//	public static String VoteType_Reduce = "0";
+	// 关注
+	public static String ActType_Add = "1";
+	// 取消关注
+	public static String ActType_Reduce = "0";
+	
+	
+	
+	
+	// 状态
+	public static enum Status {
+		/**
+		 * 问题解答中
+		 */
+		QuestionOpen(1),
+		
+		/**
+		 * 问题已关闭
+		 */
+		QuestionClose(-1),
+		
+		/**
+		 * 问题已解决
+		 */
+		QuestionResolved(2);
+		
+		private int value;
+		Status(int value){
+			this.value = value;
+		}
+		
+		public int getValue(){
+			return this.value;
+		}
+		
+	}
+	
 	
 	/**
 	 * 提问题

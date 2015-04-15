@@ -43,14 +43,14 @@ public class AnswerModule {
 	// 问题投票（赞成，反对）用Ajax调用
 	@At("/answer/?/vote/?")
 	@Ok("json")
-	public String doVoteQuestion(String id, String type, HttpServletRequest req){
+	public String doVoteAnswer(String id, String type, HttpServletRequest req){
 		String msg = null;
 		// 检测投票是否有权限
 		try {
 			Subject subject = SecurityUtils.getSubject();
-			if(KbbConstants.VoteType_Add.equals(type)){
+			if(KbbConstants.ActType_Add.equals(type)){
 				subject.checkPermission("answer:vote:add");	
-			} else if(KbbConstants.VoteType_Reduce.equals(type)){
+			} else if(KbbConstants.ActType_Reduce.equals(type)){
 				subject.checkPermission("answer:vote:reduce");
 			}
 		} catch (AuthorizationException e) {
@@ -65,5 +65,24 @@ public class AnswerModule {
 			msg = e.getMessage();
 		}
 		return msg;
+	}
+	
+	@At("/answer/?/adopt/?")
+	@Ok("json")
+	public String doAdoptAnswer(String answerId, String type) {
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			subject.checkPermission("answer:adopt");	
+		} catch (AuthorizationException e) {
+			return "您的声望值不够。";
+		}
+		
+		try {
+			this.answerService.adoptAnswer(answerId, KbbUtils.getCurrentUserId(), type);
+		} catch (Exception e) {
+			return e.getMessage();
+		}
+		
+		return "操作成功";
 	}
 }

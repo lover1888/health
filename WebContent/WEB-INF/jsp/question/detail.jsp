@@ -30,6 +30,7 @@
 						setTimeout(function(){
 							td.close().remove();
 						},2000);
+						window.location.reload();
 					}
 				});
 			},
@@ -38,9 +39,63 @@
 		}); 
 		vdialog.showModal();
 	}
+	
+	function focusq(urlStr) {
+		$.ajax({
+			url:urlStr,
+			success:function(data){
+				var td = dialog({
+					title:'提示',
+					content: data
+				});
+				td.show();
+				setTimeout(function(){
+					td.close().remove();
+				},2000);
+				window.location.reload();
+			}
+			
+		});
+	}
+	
+	function adoptq(urlStr, contentStr) {
+		var vdialog = dialog({
+			title: '提示',
+			content: contentStr,
+			okVal: '确定',
+			ok: function() {
+				this.content('采纳处理中，请稍等...');
+				$.ajax({
+					url:urlStr,
+					success:function(data){
+						var td = dialog({
+							title:'提示',
+							content: data
+						});
+						td.show();
+						setTimeout(function(){
+							td.close().remove();
+						},2000);
+						window.location.reload();
+					}
+				});
+			},
+			cancelVal: '取消',
+			cancel: true
+		}); 
+		vdialog.showModal();
+	}
+	
 </script>
 <h2>标题：${detailVo.question.title }</h2>
-&nbsp;&nbsp;<a href="">关注</a>&nbsp;&nbsp;${detailVo.question.focusCount }关注<br>
+<c:choose>
+	<c:when test="${detailVo.isFocus }">
+	&nbsp;&nbsp;<a onClick="focusq('${baseURI}/q/${detailVo.question.questionId }/focus/0')" href="#">已关注</a>&nbsp;&nbsp;${detailVo.question.focusCount }关注<br>
+	</c:when>
+	<c:otherwise>
+		&nbsp;&nbsp;<a onClick="focusq('${baseURI}/q/${detailVo.question.questionId }/focus/1')" href="#">关注</a>&nbsp;&nbsp;${detailVo.question.focusCount }关注<br>
+	</c:otherwise>
+</c:choose>
 &nbsp;&nbsp;<a href="">收藏</a>&nbsp;&nbsp;${detailVo.question.favoriteCount }收藏，${detailVo.question.viewCount }浏览
 
 <table>
@@ -88,8 +143,21 @@ ${detailVo.question.answersCount }个回答
 		</tr>
 		<tr>
 			<td></td>
-			<td><a href="#">评论</a> &nbsp;&nbsp;  <a href="#">举报</a></td>
-			<td></td>
+			<td>
+				<c:if test="${currUserId==detailVo.question.userId }">
+					<c:choose>
+						<c:when test="${detailVo.question.questionStatus==1}">
+							<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answers.answersId }/adopt/1','确认要采纳该答案吗？');" >采纳答案</a>
+						</c:when>
+						<c:when test="${ans.answers.isAdoption }">
+							<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answers.answersId }/adopt/0','确认要取消采纳该答案吗？');" >取消采纳</a>
+						</c:when>
+					</c:choose>
+				</c:if>
+				&nbsp;&nbsp;<a href="#">评论</a> &nbsp;&nbsp;  <a href="#">举报</a>
+			</td>
+			<td>
+			</td>
 		</tr>
 	</c:forEach>
 	

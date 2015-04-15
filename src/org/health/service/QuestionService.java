@@ -32,9 +32,11 @@ import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
+import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
 import org.nutz.dao.entity.Entity;
+import org.nutz.dao.entity.Record;
 import org.nutz.dao.impl.sql.callback.EntityCallback;
 import org.nutz.dao.pager.Pager;
 import org.nutz.dao.sql.Sql;
@@ -101,7 +103,7 @@ public class QuestionService extends EntityService<Question> {
 	 * @param questionId
 	 * @return
 	 */
-	public QuestionDetailVo getQuestionDetail(String questionId, String userId) {
+	public QuestionDetailVo getQuestionDetail(String questionId, final String userId) {
 		EntityCallback callback = new EntityCallback(){
 			@Override
 			protected QuestionDetailVo process(ResultSet rs, Entity<?> entity,
@@ -114,12 +116,10 @@ public class QuestionService extends EntityService<Question> {
 				rlt.setUserName(rs.getString("userName"));
 				rlt.setReputation(rs.getInt("reputationCount"));
 				rlt.setImgUrl(rs.getString("imageUrl"));
-//				try {
-//					rlt.setFocus(rs.getString("isFocus")==null?false:true);
-//					rlt.setFavorite(rs.getString("isFav")==null?false:true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
+				if(!Strings.isEmpty(userId)){
+					rlt.setFocus(rs.getString("isFocus")==null?false:true);
+					rlt.setFavorite(rs.getString("isFav")==null?false:true);
+				}
 		        return rlt;
 			}
 		};
@@ -131,10 +131,9 @@ public class QuestionService extends EntityService<Question> {
 			sql.params().set("q1", questionId);
 		} else {
 			// 查询指定问题的详细信息，提问人的详细信息，当前用户是否收藏了该问题，是否关注了该问题
-			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl, (select id from tb_user_focus uf where uf.sourceId=@q1  and uf.sourceType=@s1 and uf.userId=@u1) as isFocus, (select tuf.id from tb_user_favorites ufa, tb_user_fav tuf where tuf.sourceId=@s2 and ufa.userId=@u2 and tuf.sourceType=@s2 and tuf.favoritesId=ufa.id) as isFav from tb_question q, tb_user u where q.questionId=@q3 and q.userId=u.userId");
+			sql = Sqls.create("select q.*, u.userName, u.reputationCount, u.imageUrl, (select id from tb_focus_question uf where uf.questionId=@q1 and uf.userId=@u1) as isFocus, (select tuf.id from tb_user_favorites ufa, tb_user_fav tuf where tuf.sourceId=@s2 and ufa.userId=@u2 and tuf.sourceType=@s2 and tuf.favoritesId=ufa.id) as isFav from tb_question q, tb_user u where q.questionId=@q3 and q.userId=u.userId");
 			sql.setEntity(dao().getEntity(Question.class));
 			sql.params().set("q1", questionId);
-			sql.params().set("s1", KbbConstants.SourceType.QUESTION.getValue());
 			sql.params().set("u1", userId);
 			sql.params().set("q2", questionId);
 			sql.params().set("s2", KbbConstants.SourceType.QUESTION.getValue());
@@ -264,14 +263,11 @@ public class QuestionService extends EntityService<Question> {
 	 */
 	@Aop(TransAop.READ_COMMITTED)
 	public boolean answerQuestion(Answers answers) {
-		/*
-			1插入数据到回答表
-			2更新问题表中的回答数
-			3插入回答问题声望记录\问题被回答声望记录
-			如果是回答自己的问题不加分
-			回答问题后会自动关注该问题
-			为关注该问题的人增加通知消息
-		 */
+		// 检测是否已经回答过该问题，如果回答过，则只允许在原来的答案上修改。
+		if(!Lang.isEmpty(dao().fetch(Answers.class, Cnd.where("questionId", "=", answers.getQuestionId()).and("userId", "=", answers.getUserId())))){
+			throw Lang.makeThrow("您已经回答过该问题，请在原来回答的基础上修改或评论。", new Object[0]);
+		}
+		
 		//插入数据到回答表
 		answers.setAnswersId(KbbUtils.generateID());
 		Answers ans = dao().insert(answers);
@@ -324,7 +320,7 @@ public class QuestionService extends EntityService<Question> {
 			dao().update(Arrays.asList(u1,u2));
 		}
 		
-		// 回答问题标签积分更新：
+		// 回答问题标签积分更新：（标签得分与声望值一致）
 		// 自问自答问题标签积分不累积
 		// 回答问题标签积分只记录第一次
 		if(!ans.getQuestion().getUserId().equals(ans.getUserId())){
@@ -349,10 +345,10 @@ public class QuestionService extends EntityService<Question> {
 						utmp = new UserTags();
 						utmp.setUserId(u.getUserId());
 						utmp.setTagName(tag);
-						utmp.setValue(1);
+						utmp.setValue(maps.get(KbbConstants.Stragety_AnswerQuestion));
 						unUts.add(utmp);
-					} else {// 如果已关联标签则需要标签积分增加
-						tagFlag.setValue(tagFlag.getValue()+1);
+					} else {// 如果已关联标签则需要更新标签积分
+						tagFlag.setValue(tagFlag.getValue()+maps.get(KbbConstants.Stragety_AnswerQuestion));
 						updateTags.add(tagFlag);
 					}
 				}
@@ -377,6 +373,9 @@ public class QuestionService extends EntityService<Question> {
 		// 问题的关注数增加
 		question.setFocusCount(question.getFocusCount()+1);
 		dao().update(question);
+		
+		// 发送通知到关注该问题的人
+		// TODO
 		
 		return true;
 	}
@@ -403,7 +402,7 @@ public class QuestionService extends EntityService<Question> {
 		}
 		// 获取声望策略
 		Map<String, Integer> maps = getReputationStrategy();
-		if(KbbConstants.VoteType_Add.equals(voteType)){
+		if(KbbConstants.ActType_Add.equals(voteType)){
 			// 赞同票
 			Reputation repu = new Reputation();
 			repu.setId(KbbUtils.generateID());
@@ -426,14 +425,14 @@ public class QuestionService extends EntityService<Question> {
 			uv.setSourceId(questionId);
 			uv.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			uv.setUserId(userId);
-			uv.setVoteType(KbbConstants.VoteType_Add);
+			uv.setVoteType(KbbConstants.ActType_Add);
 			dao().insert(uv);
 			
 			// 问题投票数增加
 			q.setVoteCount(q.getVoteCount()+1);
 			dao().update(q);
 			
-		} else if(KbbConstants.VoteType_Reduce.equals(voteType)){// 反对票
+		} else if(KbbConstants.ActType_Reduce.equals(voteType)){// 反对票
 			// 被反对
 			Reputation repu = new Reputation();
 			repu.setId(KbbUtils.generateID());
@@ -469,7 +468,7 @@ public class QuestionService extends EntityService<Question> {
 			uv.setSourceId(questionId);
 			uv.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			uv.setUserId(userId);
-			uv.setVoteType(KbbConstants.VoteType_Reduce);
+			uv.setVoteType(KbbConstants.ActType_Reduce);
 			dao().insert(uv);
 			
 			// 问题投票数减少
@@ -477,6 +476,44 @@ public class QuestionService extends EntityService<Question> {
 			dao().update(q);
 		} else {
 			throw Lang.makeThrow("未知的投票类型", new Object[0]);
+		}
+	}
+	
+	/**
+	 * 用户关注问题
+	 * @Description TODO
+	 * @param userId
+	 * @param questionId
+	 */
+	@Aop(TransAop.READ_COMMITTED)
+	public void focusQuestion(String userId, String questionId, String act){
+		if(KbbConstants.ActType_Add.equals(act)){
+			// 检测是否已经关注
+			List<Record> rec =dao().query("tb_focus_question", Cnd.where("userId", "=", userId).and("questionId", "=", questionId).limit(1));
+			if(rec.size()>0){
+				throw Lang.makeThrow("操作失败，您已经关注了该问题", new Object[0]);
+			}
+			// 保存关注
+			User u = new User();
+			u.setUserId(userId);
+			Question q = new Question();
+			q.setQuestionId(questionId);
+			u.setFocusQuestions(Arrays.asList(q));
+			dao().insertRelation(u, "focusQuestions");
+			// 更新问题的关注数
+			dao().update(Question.class, Chain.makeSpecial("focusCount", "+1"), Cnd.where("questionId", "=", questionId));
+		} else if(KbbConstants.ActType_Reduce.equals(act)){
+			List<Record> rec =dao().query("tb_focus_question", Cnd.where("userId", "=", userId).and("questionId", "=", questionId).limit(1));
+			if(rec.size()<1){
+				throw Lang.makeThrow("操作失败，您还没有关注该问题", new Object[0]);
+			}
+			Sql sql = Sqls.create("delete from tb_focus_question where userId=@u1 and questionId=@q1");
+			sql.params().set("u1", userId);
+			sql.params().set("q1", questionId);
+			dao().execute(sql);
+			
+			// 更新问题的关注数
+			dao().update(Question.class, Chain.makeSpecial("focusCount", "-1"), Cnd.where("questionId", "=", questionId));
 		}
 	}
 	

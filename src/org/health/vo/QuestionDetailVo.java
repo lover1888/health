@@ -32,7 +32,7 @@ public class QuestionDetailVo extends BaseVo {
 	/**  
 	 * @return the isFocus  
 	 */
-	public boolean isFocus() {
+	public boolean getIsFocus() {
 		return isFocus;
 	}
 
@@ -46,7 +46,7 @@ public class QuestionDetailVo extends BaseVo {
 	/**  
 	 * @return the isFavorite  
 	 */
-	public boolean isFavorite() {
+	public boolean getIsFavorite() {
 		return isFavorite;
 	}
 
