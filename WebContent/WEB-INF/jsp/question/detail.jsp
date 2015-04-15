@@ -30,7 +30,7 @@
 						setTimeout(function(){
 							td.close().remove();
 						},2000);
-						window.location.reload();
+						//window.location.reload();
 					}
 				});
 			},

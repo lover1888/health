@@ -87,7 +87,12 @@ public class QuestionModule {
 		question.setQuestionId(KbbUtils.generateID());
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		question.setUserId(userId);
-		this.questionService.saveQuestion(question);
+		try {
+			this.questionService.saveQuestion(question);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	// 问题详情
@@ -110,7 +115,11 @@ public class QuestionModule {
 	public View doQuestionAnswer(@Param("..") Answers answer) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
-		this.questionService.answerQuestion(answer);
+		try {
+			this.questionService.answerQuestion(answer);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		return new ViewWrapper(new ServerRedirectView("/q/"
 				+ answer.getQuestionId()), null);

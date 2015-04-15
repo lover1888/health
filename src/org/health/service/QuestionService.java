@@ -11,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,13 +21,13 @@ import org.health.model.Answers;
 import org.health.model.Comments;
 import org.health.model.Question;
 import org.health.model.Reputation;
-import org.health.model.ReputationStrategy;
 import org.health.model.Tags;
 import org.health.model.User;
 import org.health.model.UserTags;
 import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
+import org.health.util.ServiceUtils;
 import org.health.vo.AnswerVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
@@ -194,7 +193,7 @@ public class QuestionService extends EntityService<Question> {
 	 * @return
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public boolean saveQuestion(Question question) {
+	public boolean saveQuestion(Question question) throws Exception {
 		// 保存问题
 		question.setQuestionId(KbbUtils.generateID());
 		Question q = dao().insert(question);
@@ -262,7 +261,7 @@ public class QuestionService extends EntityService<Question> {
 	 * 回答问题
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public boolean answerQuestion(Answers answers) {
+	public boolean answerQuestion(Answers answers) throws Exception {
 		// 检测是否已经回答过该问题，如果回答过，则只允许在原来的答案上修改。
 		if(!Lang.isEmpty(dao().fetch(Answers.class, Cnd.where("questionId", "=", answers.getQuestionId()).and("userId", "=", answers.getUserId())))){
 			throw Lang.makeThrow("您已经回答过该问题，请在原来回答的基础上修改或评论。", new Object[0]);
@@ -279,7 +278,7 @@ public class QuestionService extends EntityService<Question> {
 		dao().update(question);
 		
 		// 获取声望策略
-		Map<String, Integer> maps = getReputationStrategy();
+		Map<String, Integer> maps = ServiceUtils.getReputationStrategy(dao());
 		
 		// 声望不记录自问自答
 		if(!ans.getQuestion().getUserId().equals(ans.getUserId())){
@@ -389,7 +388,7 @@ public class QuestionService extends EntityService<Question> {
 	 * @param userId 投票用户Id
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public void voteQuestion(String questionId, String voteType, String userId){
+	public void voteQuestion(String questionId, String voteType, String userId) throws Exception{
 		Question q = dao().fetch(Question.class, Cnd.where("questionId", "=", questionId));
 		// 不能对自己的问题投票
 		if(q.getUserId().equals(userId)){
@@ -401,7 +400,7 @@ public class QuestionService extends EntityService<Question> {
 			throw Lang.makeThrow("您已经对问题投过票", new Object[0]);
 		}
 		// 获取声望策略
-		Map<String, Integer> maps = getReputationStrategy();
+		Map<String, Integer> maps =  ServiceUtils.getReputationStrategy(dao());
 		if(KbbConstants.ActType_Add.equals(voteType)){
 			// 赞同票
 			Reputation repu = new Reputation();
@@ -429,7 +428,7 @@ public class QuestionService extends EntityService<Question> {
 			dao().insert(uv);
 			
 			// 问题投票数增加
-			q.setVoteCount(q.getVoteCount()+1);
+			q.setVoteAddCount(q.getVoteAddCount()+1);
 			dao().update(q);
 			
 		} else if(KbbConstants.ActType_Reduce.equals(voteType)){// 反对票
@@ -472,7 +471,7 @@ public class QuestionService extends EntityService<Question> {
 			dao().insert(uv);
 			
 			// 问题投票数减少
-			q.setVoteCount(q.getVoteCount()-1);
+			q.setVoteReduceCount(q.getVoteReduceCount()+1);
 			dao().update(q);
 		} else {
 			throw Lang.makeThrow("未知的投票类型", new Object[0]);
@@ -486,7 +485,7 @@ public class QuestionService extends EntityService<Question> {
 	 * @param questionId
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public void focusQuestion(String userId, String questionId, String act){
+	public void focusQuestion(String userId, String questionId, String act) throws Exception{
 		if(KbbConstants.ActType_Add.equals(act)){
 			// 检测是否已经关注
 			List<Record> rec =dao().query("tb_focus_question", Cnd.where("userId", "=", userId).and("questionId", "=", questionId).limit(1));
@@ -516,15 +515,4 @@ public class QuestionService extends EntityService<Question> {
 			dao().update(Question.class, Chain.makeSpecial("focusCount", "-1"), Cnd.where("questionId", "=", questionId));
 		}
 	}
-	
-	// 获取声望策略
-	public Map<String, Integer> getReputationStrategy(){
-		List<ReputationStrategy> strategies = dao().query(ReputationStrategy.class, null);
-		Map<String, Integer> maps = new HashMap<String, Integer>();
-		for(ReputationStrategy stra:strategies) {
-			maps.put(stra.getStrategyName(), stra.getRelatedUserValue());
-		}
-		return maps;
-	}
-
 }

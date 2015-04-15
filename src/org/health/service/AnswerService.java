@@ -7,21 +7,17 @@
  */
 package org.health.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.health.model.Answers;
 import org.health.model.Question;
 import org.health.model.Reputation;
-import org.health.model.ReputationStrategy;
 import org.health.model.User;
-import org.health.model.UserTags;
 import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
+import org.health.util.ServiceUtils;
 import org.nutz.aop.interceptor.ioc.TransAop;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
@@ -41,7 +37,7 @@ public class AnswerService extends EntityService<Answers> {
 	
 	// 采纳答案
 	@Aop(TransAop.READ_COMMITTED)
-	public void adoptAnswer(String answerId, String userId, String act){
+	public void adoptAnswer(String answerId, String userId, String act) throws Exception{
 		// 先找出这个答案
 		Answers ans = dao().fetchLinks(dao().fetch(Answers.class, Cnd.where("answersId", "=", answerId)),"question");
 		if(Lang.isEmpty(ans)){
@@ -69,7 +65,7 @@ public class AnswerService extends EntityService<Answers> {
 			// 自己采纳自己的答案不增加声望
 			if(!ans.getUserId().equals(userId)){
 				// 声望
-				Map<String, Integer> maps = getReputationStrategy();
+				Map<String, Integer> maps =  ServiceUtils.getReputationStrategy(dao());
 				//采纳者声望记录
 				Reputation repu = new Reputation();
 				repu.setId(KbbUtils.generateID());
@@ -102,22 +98,23 @@ public class AnswerService extends EntityService<Answers> {
 				dao().update(u2);
 				
 				// 给被采纳答案者更新标签积分
-				u2 = dao().fetchLinks(u2, "userTags");
-				List<UserTags> upds = new ArrayList<UserTags>();
-				List<UserTags> utags = u2.getUserTags();
-				String[] tgs = q.getTags().split(",");
-				for(UserTags ut:utags){
-					for(String tg:tgs){
-						if(ut.getTagName().equals(tg)){
-							ut.setValue(ut.getValue()+maps.get(KbbConstants.Stragety_AnswerBeAdopt));
-							upds.add(ut);
-							break;
-						}
-					}
-				}
-				if(upds.size()>0){
-					dao().update(upds);
-				}
+				ServiceUtils.updateUserTagsValue(u2.getUserId(), q.getTags(), maps.get(KbbConstants.Stragety_AnswerBeAdopt), dao());
+//				u2 = dao().fetchLinks(u2, "userTags");
+//				List<UserTags> upds = new ArrayList<UserTags>();
+//				List<UserTags> utags = u2.getUserTags();
+//				String[] tgs = q.getTags().split(",");
+//				for(UserTags ut:utags){
+//					for(String tg:tgs){
+//						if(ut.getTagName().equals(tg)){
+//							ut.setValue(ut.getValue()+maps.get(KbbConstants.Stragety_AnswerBeAdopt));
+//							upds.add(ut);
+//							break;
+//						}
+//					}
+//				}
+//				if(upds.size()>0){
+//					dao().update(upds);
+//				}
 			}
 			
 			
@@ -136,7 +133,7 @@ public class AnswerService extends EntityService<Answers> {
 			
 			if(!ans.getUserId().equals(userId)){
 				// 声望
-				Map<String, Integer> maps = getReputationStrategy();
+				Map<String, Integer> maps =  ServiceUtils.getReputationStrategy(dao());
 				
 				//删除采纳者声望记录
 				Sql sql = Sqls.create("delete from tb_reputation where reputationType=@rt and sourceId=@sid and userId=@uid and sourceType=@st");
@@ -162,22 +159,23 @@ public class AnswerService extends EntityService<Answers> {
 				dao().update(u2);
 				
 				// 给被采纳答案者更新标签积分
-				u2 = dao().fetchLinks(u2, "userTags");
-				List<UserTags> upds = new ArrayList<UserTags>();
-				List<UserTags> utags = u2.getUserTags();
-				String[] tgs = q.getTags().split(",");
-				for(UserTags ut:utags){
-					for(String tg:tgs){
-						if(ut.getTagName().equals(tg)){
-							ut.setValue(ut.getValue()-maps.get(KbbConstants.Stragety_AnswerBeAdopt));
-							upds.add(ut);
-							break;
-						}
-					}
-				}
-				if(upds.size()>0){
-					dao().update(upds);
-				}
+				ServiceUtils.updateUserTagsValue(u2.getUserId(), q.getTags(), -maps.get(KbbConstants.Stragety_AnswerBeAdopt), dao());
+//				u2 = dao().fetchLinks(u2, "userTags");
+//				List<UserTags> upds = new ArrayList<UserTags>();
+//				List<UserTags> utags = u2.getUserTags();
+//				String[] tgs = q.getTags().split(",");
+//				for(UserTags ut:utags){
+//					for(String tg:tgs){
+//						if(ut.getTagName().equals(tg)){
+//							ut.setValue(ut.getValue()-maps.get(KbbConstants.Stragety_AnswerBeAdopt));
+//							upds.add(ut);
+//							break;
+//						}
+//					}
+//				}
+//				if(upds.size()>0){
+//					dao().update(upds);
+//				}
 			}
 			
 		} 
@@ -193,7 +191,7 @@ public class AnswerService extends EntityService<Answers> {
 	 * @param userId 投票人
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public void voteAnswer(String answerId, String voteType, String userId){
+	public void voteAnswer(String answerId, String voteType, String userId) throws Exception{
 		Answers a = dao().fetchLinks(dao().fetch(Answers.class, Cnd.where("answersId", "=", answerId)),"question");
 		// 不能对自己的回答投票
 		if(a.getUserId().equals(userId)){
@@ -205,7 +203,7 @@ public class AnswerService extends EntityService<Answers> {
 			throw Lang.makeThrow("您已经对答案投过票", new Object[0]);
 		}
 		// 获取声望策略
-		Map<String, Integer> maps = getReputationStrategy();
+		Map<String, Integer> maps =  ServiceUtils.getReputationStrategy(dao());
 		if(KbbConstants.ActType_Add.equals(voteType)){
 			// 赞同票
 			Reputation repu = new Reputation();
@@ -235,8 +233,11 @@ public class AnswerService extends EntityService<Answers> {
 			dao().insert(uv);
 			
 			// 答案投票数增加
-			a.setVoteCount(a.getVoteCount()+1);
+			a.setVoteAddCount(a.getVoteAddCount()+1);
 			dao().update(a);
+			
+			// 更新标签积分
+			ServiceUtils.updateUserTagsValue(u1.getUserId(), a.getQuestion().getTags(), maps.get(KbbConstants.Stragety_AnswerBeVoteAdd), dao());
 			
 		} else if(KbbConstants.ActType_Reduce.equals(voteType)){// 反对票
 			// 被反对
@@ -252,6 +253,8 @@ public class AnswerService extends EntityService<Answers> {
 			//更新被反对答案用户的声望数
 			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", a.getUserId()));
 			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_AnswerBeVoteReduce));
+			// 更新标签积分
+			ServiceUtils.updateUserTagsValue(u1.getUserId(), a.getQuestion().getTags(), maps.get(KbbConstants.Stragety_AnswerBeVoteReduce), dao());
 			
 			// 反对者
 			Reputation repu2 = new Reputation();
@@ -281,20 +284,11 @@ public class AnswerService extends EntityService<Answers> {
 			dao().insert(uv);
 			
 			// 答案投票数减少
-			a.setVoteCount(a.getVoteCount()-1);
+			a.setVoteReduceCount(a.getVoteReduceCount()+1);
 			dao().update(a);
 		} else {
 			throw Lang.makeThrow("未知的投票类型", new Object[0]);
 		}
 	}
 	
-	// 获取声望策略
-	public Map<String, Integer> getReputationStrategy(){
-		List<ReputationStrategy> strategies = dao().query(ReputationStrategy.class, null);
-		Map<String, Integer> maps = new HashMap<String, Integer>();
-		for(ReputationStrategy stra:strategies) {
-			maps.put(stra.getStrategyName(), stra.getRelatedUserValue());
-		}
-		return maps;
-	}
 }

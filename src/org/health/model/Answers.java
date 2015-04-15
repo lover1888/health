@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
+import org.nutz.dao.entity.annotation.Readonly;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -32,12 +33,33 @@ public class Answers {
 	private String content;
 	private Date createDate = new Date();
 	private Date updateDate = new Date();
+	@Readonly
 	private int voteCount;
+	private int voteAddCount;
+	private int voteReduceCount;
 	private int commentCount;
 	private boolean isAdoption;
 	private boolean isIgnore;
 	private boolean isComplaints;
 	private int flag;
+
+	
+	
+	public int getVoteAddCount() {
+		return voteAddCount;
+	}
+
+	public void setVoteAddCount(int voteAddCount) {
+		this.voteAddCount = voteAddCount;
+	}
+
+	public int getVoteReduceCount() {
+		return voteReduceCount;
+	}
+
+	public void setVoteReduceCount(int voteReduceCount) {
+		this.voteReduceCount = voteReduceCount;
+	}
 
 	/**
 	 * @return the answersId
@@ -133,7 +155,7 @@ public class Answers {
 	 * @return the voteCount
 	 */
 	public int getVoteCount() {
-		return voteCount;
+		return voteCount = this.voteAddCount-this.voteReduceCount;
 	}
 
 	/**

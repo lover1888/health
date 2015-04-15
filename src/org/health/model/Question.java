@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Name;
+import org.nutz.dao.entity.annotation.Readonly;
 import org.nutz.dao.entity.annotation.Table;
 
 /**
@@ -33,7 +34,10 @@ public class Question {
 	private Date updateDate = new Date();
 	private int viewCount;
 	private int answersCount;
+	@Readonly
 	private int voteCount;
+	private int voteAddCount;
+	private int voteReduceCount;
 	private int favoriteCount;
 	private int focusCount;
 	private int commentCount;
@@ -45,6 +49,24 @@ public class Question {
 
 	@Many(target = Answers.class, field = "questionId")
 	private List<Answers> answers;
+
+	
+	
+	public int getVoteAddCount() {
+		return voteAddCount;
+	}
+
+	public void setVoteAddCount(int voteAddCount) {
+		this.voteAddCount = voteAddCount;
+	}
+
+	public int getVoteReduceCount() {
+		return voteReduceCount;
+	}
+
+	public void setVoteReduceCount(int voteReduceCount) {
+		this.voteReduceCount = voteReduceCount;
+	}
 
 	/**
 	 * @return the questionId
@@ -185,7 +207,7 @@ public class Question {
 	 * @return the voteCount
 	 */
 	public int getVoteCount() {
-		return voteCount;
+		return voteCount = this.voteAddCount-this.voteReduceCount;
 	}
 
 	/**
