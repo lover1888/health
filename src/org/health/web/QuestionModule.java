@@ -15,9 +15,9 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.health.common.page.Pagination;
-import org.health.model.Answers;
+import org.health.model.Answer;
 import org.health.model.Question;
-import org.health.model.QuestionComments;
+import org.health.model.QuestionComment;
 import org.health.service.QuestionService;
 import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
@@ -118,7 +118,7 @@ public class QuestionModule {
 
 	// 回答问题
 	@At("/q/answer")
-	public View doAnswerQuestion(@Param("..") Answers answer) {
+	public View doAnswerQuestion(@Param("..") Answer answer) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
 		try {
@@ -139,7 +139,7 @@ public class QuestionModule {
 	
 	@At("/q/comment")
 	@Fail("json")
-	public View doCommentQuestion(@Param("..") QuestionComments comment) {
+	public View doCommentQuestion(@Param("..") QuestionComment comment) {
 		// 检测是否有权限
 		try {
 			Subject subject = SecurityUtils.getSubject();

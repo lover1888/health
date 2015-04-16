@@ -112,7 +112,7 @@
 			success:function(data){
 				$('#comment'+id+'Detail').html("<hr>");
 				$.each($.parseJSON(data),function(idx, obj){
-					$('#comment'+id+'Detail').append(obj.answersComments.content+" >>> "+obj.userName).append("<p>");
+					$('#comment'+id+'Detail').append(obj.answerComment.content+" >>> "+obj.userName).append("<p>");
 				}); 
 			}
 		});
@@ -133,7 +133,7 @@
 		    success: function(data) {
 		    	$('#comment'+id+'Detail').html("<hr>");
 				$.each($.parseJSON(data),function(idx, obj){
-					$('#comment'+id+'Detail').append(obj.answersComments.content+" >>> "+obj.userName).append("<p>");
+					$('#comment'+id+'Detail').append(obj.answerComment.content+" >>> "+obj.userName).append("<p>");
 				}); 
 		    }
 		});
@@ -197,13 +197,13 @@ ${detailVo.question.answersCount }个回答
 	<c:forEach items="${ansPg.list }" var="ans" varStatus="status">
 		<tr>
 			<td width="60" align="center">
-			<a href="#" onclick="vote('${baseURI}/answer/${ans.answers.answersId }/vote/1','确认要为它投赞同票吗？');">赞同</a><br>
-			${ans.answers.voteCount }<br>
-			<a href="#" onclick="vote('${baseURI}/answer/${ans.answers.answersId }/vote/0','确认要为它投反对票吗？');">反对</a>
+			<a href="#" onclick="vote('${baseURI}/answer/${ans.answer.answerId }/vote/1','确认要为它投赞同票吗？');">赞同</a><br>
+			${ans.answer.voteCount }<br>
+			<a href="#" onclick="vote('${baseURI}/answer/${ans.answer.answerId }/vote/0','确认要为它投反对票吗？');">反对</a>
 			</td>
 			<td width="460">
-			${ ans.answers.content}<p>
-			回答人:<a href="<c:url value='/u/${ans.userName }'></c:url>">${ans.userName }</a>&nbsp;&nbsp;声望:${ans.reputation }&nbsp;&nbsp;<fmt:formatDate value="${ans.answers.createDate }" pattern="MM/dd HH:mm"/> 
+			${ ans.answer.content}<p>
+			回答人:<a href="<c:url value='/u/${ans.userName }'></c:url>">${ans.userName }</a>&nbsp;&nbsp;声望:${ans.reputation }&nbsp;&nbsp;<fmt:formatDate value="${ans.answer.createDate }" pattern="MM/dd HH:mm"/> 
 			</td>
 			<td width="80">头像:${ans.imgUrl }</td>
 		</tr>
@@ -214,26 +214,26 @@ ${detailVo.question.answersCount }个回答
 					<c:when test="${currUserId==detailVo.question.userId }">
 						<c:choose>
 							<c:when test="${detailVo.question.questionStatus==0}">
-								<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answers.answersId }/adopt/1','确认要采纳该答案吗？');" >采纳答案</a>
+								<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answer.answerId }/adopt/1','确认要采纳该答案吗？');" >采纳答案</a>
 							</c:when>
-							<c:when test="${ans.answers.isAdoption }">
-								<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answers.answersId }/adopt/0','确认要取消采纳该答案吗？');" >取消采纳</a>
+							<c:when test="${ans.answer.isAdoption }">
+								<a href="#" onclick="adoptq('${baseURI}/answer/${ans.answer.answerId }/adopt/0','确认要取消采纳该答案吗？');" >取消采纳</a>
 							</c:when>
 						</c:choose>
 					</c:when>
-					<c:when test="${ans.answers.isAdoption }">
+					<c:when test="${ans.answer.isAdoption }">
 						已采纳
 					</c:when>
 				</c:choose>
 				
-				&nbsp;&nbsp;<a href="#" onclick="commenta('${baseURI}/answer/${ans.answers.answersId  }/comment/list',${status.count});">${ans.answers.commentCount } 评论</a> &nbsp;&nbsp;  <a href="#">举报</a>
+				&nbsp;&nbsp;<a href="#" onclick="commenta('${baseURI}/answer/${ans.answer.answerId  }/comment/list',${status.count});">${ans.answer.commentCount } 评论</a> &nbsp;&nbsp;  <a href="#">举报</a>
 				<div id="comment${status.count}" style="display: none">
 					<div id="comment${status.count}Detail">
 					</div>
 					<hr>
 					<form id="comment${status.count}Form">
 						<textarea rows="5" cols="50" name="content"></textarea><br>
-						<input type="hidden" name="answersId" value="${ans.answers.answersId }">
+						<input type="hidden" name="answerId" value="${ans.answer.answerId }">
 					</form>
 					<input type="button" value="提交按钮" onclick="postComment(${status.count});">
 				</div>

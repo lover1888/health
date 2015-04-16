@@ -21,10 +21,10 @@ import org.nutz.dao.entity.annotation.Table;
  * @author jhengfei
  * @date 2015年4月1日 上午9:00:25
  */
-@Table("tb_answers")
-public class Answers {
+@Table("tb_answer")
+public class Answer {
 	@Name
-	private String answersId;
+	private String answerId;
 	private String questionId;
 
 	@One(target = Question.class, field = "questionId")
@@ -45,21 +45,15 @@ public class Answers {
 	private boolean isComplaints;
 	private int flag;
 	
-	@Many(target=AnswersComments.class, field="answersId")
-	private List<AnswersComments> answersComments;
+	@Many(target=AnswerComment.class, field="answerId")
+	private List<AnswerComment> answerComments;
 	
-	/**  
-	 * @return the answersComments  
-	 */
-	public List<AnswersComments> getAnswersComments() {
-		return answersComments;
+	public List<AnswerComment> getAnswerComments() {
+		return answerComments;
 	}
 
-	/**  
-	 * @param answersComments the answersComments to set  
-	 */
-	public void setAnswersComments(List<AnswersComments> answersComments) {
-		this.answersComments = answersComments;
+	public void setAnswerComments(List<AnswerComment> answerComments) {
+		this.answerComments = answerComments;
 	}
 
 	public int getVoteAddCount() {
@@ -78,19 +72,13 @@ public class Answers {
 		this.voteReduceCount = voteReduceCount;
 	}
 
-	/**
-	 * @return the answersId
-	 */
-	public String getAnswersId() {
-		return answersId;
+
+	public String getAnswerId() {
+		return answerId;
 	}
 
-	/**
-	 * @param answersId
-	 *            the answersId to set
-	 */
-	public void setAnswersId(String answersId) {
-		this.answersId = answersId;
+	public void setAnswerId(String answerId) {
+		this.answerId = answerId;
 	}
 
 	/**

@@ -7,8 +7,8 @@
  */
 package org.health.vo;
 
-import org.health.model.AnswersComments;
-import org.health.model.QuestionComments;
+import org.health.model.AnswerComment;
+import org.health.model.QuestionComment;
 
 /**
  * @Description TODO
@@ -17,14 +17,14 @@ import org.health.model.QuestionComments;
  */
 public class CommentsVo extends BaseVo {
 
-	private QuestionComments questionComments;
+	private QuestionComment questionComments;
 
-	private AnswersComments answersComments;
+	private AnswerComment answerComment;
 
 	/**
 	 * @return the questionComments
 	 */
-	public QuestionComments getQuestionComments() {
+	public QuestionComment getQuestionComments() {
 		return questionComments;
 	}
 
@@ -32,23 +32,17 @@ public class CommentsVo extends BaseVo {
 	 * @param questionComments
 	 *            the questionComments to set
 	 */
-	public void setQuestionComments(QuestionComments questionComments) {
+	public void setQuestionComments(QuestionComment questionComments) {
 		this.questionComments = questionComments;
 	}
 
-	/**
-	 * @return the answersComments
-	 */
-	public AnswersComments getAnswersComments() {
-		return answersComments;
+	public AnswerComment getAnswerComment() {
+		return answerComment;
 	}
 
-	/**
-	 * @param answersComments
-	 *            the answersComments to set
-	 */
-	public void setAnswersComments(AnswersComments answersComments) {
-		this.answersComments = answersComments;
+	public void setAnswerComment(AnswerComment answerComment) {
+		this.answerComment = answerComment;
 	}
+
 
 }

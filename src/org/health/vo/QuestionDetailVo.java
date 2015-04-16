@@ -9,8 +9,8 @@ package org.health.vo;
 
 import java.util.List;
 
-import org.health.model.Answers;
-import org.health.model.QuestionComments;
+import org.health.model.Answer;
+import org.health.model.QuestionComment;
 import org.health.model.Question;
 
 /**
@@ -25,9 +25,9 @@ public class QuestionDetailVo extends BaseVo {
 
 	private Question question;
 	
-	private List<QuestionComments> comments;
+	private List<QuestionComment> comments;
 	
-	private List<Answers> answers;
+	private List<Answer> answers;
 
 	/**  
 	 * @return the isFocus  
@@ -74,28 +74,28 @@ public class QuestionDetailVo extends BaseVo {
 	/**  
 	 * @return the comments  
 	 */
-	public List<QuestionComments> getComments() {
+	public List<QuestionComment> getComments() {
 		return comments;
 	}
 
 	/**  
 	 * @param comments the comments to set  
 	 */
-	public void setComments(List<QuestionComments> comments) {
+	public void setComments(List<QuestionComment> comments) {
 		this.comments = comments;
 	}
 
 	/**  
 	 * @return the answers  
 	 */
-	public List<Answers> getAnswers() {
+	public List<Answer> getAnswers() {
 		return answers;
 	}
 
 	/**  
 	 * @param answers the answers to set  
 	 */
-	public void setAnswers(List<Answers> answers) {
+	public void setAnswers(List<Answer> answers) {
 		this.answers = answers;
 	}
 	

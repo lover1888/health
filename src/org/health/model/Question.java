@@ -47,24 +47,24 @@ public class Question {
 
 	private String lastActiveInfo;
 
-	@Many(target = Answers.class, field = "questionId")
-	private List<Answers> answers;
+	@Many(target = Answer.class, field = "questionId")
+	private List<Answer> answers;
 	
-	@Many(target = QuestionComments.class, field="questionId")
-	private List<QuestionComments> questionComments;
+	@Many(target = QuestionComment.class, field="questionId")
+	private List<QuestionComment> questionComments;
 	
 	
 	/**  
 	 * @return the questionComments  
 	 */
-	public List<QuestionComments> getQuestionComments() {
+	public List<QuestionComment> getQuestionComments() {
 		return questionComments;
 	}
 
 	/**  
 	 * @param questionComments the questionComments to set  
 	 */
-	public void setQuestionComments(List<QuestionComments> questionComments) {
+	public void setQuestionComments(List<QuestionComment> questionComments) {
 		this.questionComments = questionComments;
 	}
 
@@ -312,7 +312,7 @@ public class Question {
 	/**
 	 * @return the answers
 	 */
-	public List<Answers> getAnswers() {
+	public List<Answer> getAnswers() {
 		return answers;
 	}
 
@@ -320,7 +320,7 @@ public class Question {
 	 * @param answers
 	 *            the answers to set
 	 */
-	public void setAnswers(List<Answers> answers) {
+	public void setAnswers(List<Answer> answers) {
 		this.answers = answers;
 	}
 

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
-import org.health.model.AnswersComments;
+import org.health.model.AnswerComment;
 import org.health.service.AnswerService;
 import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
@@ -25,13 +25,9 @@ import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
-import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
-import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
-import org.nutz.mvc.view.ServerRedirectView;
-import org.nutz.mvc.view.ViewWrapper;
 
 /**
  * @Description TODO
@@ -51,12 +47,12 @@ public class AnswerModule {
 	
 	@At("/answer/?/comment/list")
 	@Ok("json")
-	public List<CommentsVo> doGetAnswersComments(String answersId){
-		return this.answerService.getComments(answersId);
+	public List<CommentsVo> doGetAnswerComments(String answerId){
+		return this.answerService.getComments(answerId);
 	}
 	@At("/answer/comment")
 	@Ok("json")
-	public List<CommentsVo> doCommentAnswer(@Param("..") AnswersComments comment) {
+	public List<CommentsVo> doCommentAnswer(@Param("..") AnswerComment comment) {
 		// 检测是否有权限
 		try {
 			Subject subject = SecurityUtils.getSubject();
@@ -66,7 +62,7 @@ public class AnswerModule {
 		}
 		comment.setUserId(KbbUtils.getCurrentUserId());
 		this.answerService.saveAnswerComments(comment);
-		return this.answerService.getComments(comment.getAnswersId());
+		return this.answerService.getComments(comment.getAnswerId());
 //		return new ViewWrapper(new ServerRedirectView("/q/"
 //				+ comment.getAnswersId()), null);
 	}

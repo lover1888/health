@@ -153,7 +153,7 @@ public class KbbConstants {
 	 */
 	public static enum SourceType {
 		QUESTION("1"),
-		ANSWERS("2"),
+		ANSWER("2"),
 		TAGS("3"),
 		ARTICLE("4"),
 		USER("5");

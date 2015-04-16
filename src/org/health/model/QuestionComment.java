@@ -17,8 +17,8 @@ import org.nutz.dao.entity.annotation.Table;
  * @author jhengfei
  * @date 2015年4月1日 上午9:03:22
  */
-@Table("tb_question_comments")
-public class QuestionComments {
+@Table("tb_question_comment")
+public class QuestionComment {
 	@Id
 	private Long id;
 	private String questionId;

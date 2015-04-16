@@ -9,8 +9,8 @@ package org.health.vo;
 
 import java.util.List;
 
-import org.health.model.Answers;
-import org.health.model.QuestionComments;
+import org.health.model.Answer;
+import org.health.model.QuestionComment;
 
 /**
  * @Description TODO
@@ -19,29 +19,24 @@ import org.health.model.QuestionComments;
  */
 public class AnswerVo extends BaseVo {
 
-	private Answers answers;
+	private Answer answer;
 
-	private List<QuestionComments> comments;
+	private List<QuestionComment> comments;
 
-	/**
-	 * @return the answers
-	 */
-	public Answers getAnswers() {
-		return answers;
+	
+
+	public Answer getAnswer() {
+		return answer;
 	}
 
-	/**
-	 * @param answers
-	 *            the answers to set
-	 */
-	public void setAnswers(Answers answers) {
-		this.answers = answers;
+	public void setAnswer(Answer answer) {
+		this.answer = answer;
 	}
 
 	/**
 	 * @return the comments
 	 */
-	public List<QuestionComments> getComments() {
+	public List<QuestionComment> getComments() {
 		return comments;
 	}
 
@@ -49,7 +44,7 @@ public class AnswerVo extends BaseVo {
 	 * @param comments
 	 *            the comments to set
 	 */
-	public void setComments(List<QuestionComments> comments) {
+	public void setComments(List<QuestionComment> comments) {
 		this.comments = comments;
 	}
 

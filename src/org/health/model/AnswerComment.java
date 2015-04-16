@@ -17,11 +17,11 @@ import org.nutz.dao.entity.annotation.Table;
  * @author jhengfei
  * @date 2015年4月1日 上午9:03:22
  */
-@Table("tb_answers_comments")
-public class AnswersComments {
+@Table("tb_answer_comment")
+public class AnswerComment {
 	@Id
 	private Long id;
-	private String answersId;
+	private String answerId;
 	private String userId;
 	private String content;
 	private Date createDate = new Date();
@@ -102,19 +102,12 @@ public class AnswersComments {
 		this.id = id;
 	}
 
-	/**
-	 * @return the answersId
-	 */
-	public String getAnswersId() {
-		return answersId;
+	public String getAnswerId() {
+		return answerId;
 	}
 
-	/**
-	 * @param answersId
-	 *            the answersId to set
-	 */
-	public void setAnswersId(String answersId) {
-		this.answersId = answersId;
+	public void setAnswerId(String answerId) {
+		this.answerId = answerId;
 	}
 
 }

@@ -17,9 +17,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.health.common.page.Pagination;
-import org.health.model.Answers;
+import org.health.model.Answer;
 import org.health.model.Question;
-import org.health.model.QuestionComments;
+import org.health.model.QuestionComment;
 import org.health.model.Reputation;
 import org.health.model.Tags;
 import org.health.model.User;
@@ -158,7 +158,7 @@ public class QuestionService extends EntityService<Question> {
 				AnswerVo vo;
 				while(rs.next()) {
 					vo = new AnswerVo();
-					vo.setAnswers((Answers)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setAnswer((Answer)entity.getObject(rs, context.getFieldMatcher(), null));
 					vo.setUserName(rs.getString("userName"));
 					vo.setReputation(rs.getInt("reputationCount"));
 					vo.setImgUrl(rs.getString("imageUrl"));
@@ -168,18 +168,18 @@ public class QuestionService extends EntityService<Question> {
 			}
 		};
 		
-		Sql sql = Sqls.create("select a.*,u.userName, u.reputationCount, u.imageUrl from tb_answers a, tb_user u where a.questionId=@q1 and a.userId=u.userId");
+		Sql sql = Sqls.create("select a.*,u.userName, u.reputationCount, u.imageUrl from tb_answer a, tb_user u where a.questionId=@q1 and a.userId=u.userId");
 		sql.params().set("q1", questionId);
-		sql.setEntity(dao().getEntity(Answers.class));
+		sql.setEntity(dao().getEntity(Answer.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
 		return new Pagination<AnswerVo>(pageNum, pageSize, 0, sql.getList(AnswerVo.class));
 	}
 	
 	@Aop(TransAop.READ_COMMITTED)
-	public int saveQuestionComments(QuestionComments comment){
+	public int saveQuestionComments(QuestionComment comment){
 		// 插入
-		QuestionComments cmnt = dao().insert(comment);
+		QuestionComment cmnt = dao().insert(comment);
 		// 更新问题评论数
 		dao().update(Question.class, Chain.makeSpecial("commentCount", "+1"), Cnd.where("questionId", "=", comment.getQuestionId()));
 		
@@ -202,7 +202,7 @@ public class QuestionService extends EntityService<Question> {
 				CommentsVo vo;
 				while(rs.next()) {
 					vo = new CommentsVo();
-					vo.setQuestionComments((QuestionComments)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setQuestionComments((QuestionComment)entity.getObject(rs, context.getFieldMatcher(), null));
 					vo.setUserName(rs.getString("userName"));
 					vo.setReputation(rs.getInt("reputationCount"));
 					vo.setImgUrl(rs.getString("imageUrl"));
@@ -214,7 +214,7 @@ public class QuestionService extends EntityService<Question> {
 		
 		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_question_comments qc, tb_user u where qc.questionId=@q1 and qc.userId=u.userId;");
 		sql.params().set("q1", questionId);
-		sql.setEntity(dao().getEntity(QuestionComments.class));
+		sql.setEntity(dao().getEntity(QuestionComment.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
 		return sql.getList(CommentsVo.class);
@@ -295,15 +295,15 @@ public class QuestionService extends EntityService<Question> {
 	 * 回答问题
 	 */
 	@Aop(TransAop.READ_COMMITTED)
-	public boolean answerQuestion(Answers answers) throws Exception {
+	public boolean answerQuestion(Answer answer) throws Exception {
 		// 检测是否已经回答过该问题，如果回答过，则只允许在原来的答案上修改。
-		if(!Lang.isEmpty(dao().fetch(Answers.class, Cnd.where("questionId", "=", answers.getQuestionId()).and("userId", "=", answers.getUserId())))){
+		if(!Lang.isEmpty(dao().fetch(Answer.class, Cnd.where("questionId", "=", answer.getQuestionId()).and("userId", "=", answer.getUserId())))){
 			throw Lang.makeThrow("您已经回答过该问题，请在原来回答的基础上修改或评论。", new Object[0]);
 		}
 		
 		//插入数据到回答表
-		answers.setAnswersId(KbbUtils.generateID());
-		Answers ans = dao().insert(answers);
+		answer.setAnswerId(KbbUtils.generateID());
+		Answer ans = dao().insert(answer);
 		ans = dao().fetchLinks(ans, "question");
 		
 		//更新问题表中的回答数 
@@ -326,7 +326,7 @@ public class QuestionService extends EntityService<Question> {
 			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			repu.setUserId(ans.getUserId());
 			repu.setValue(maps.get(KbbConstants.Stragety_AnswerQuestion));	
-			repu.setAnswersId(ans.getAnswersId());
+			repu.setAnswerId(ans.getAnswerId());
 			repus.add(repu);
 		
 			// 问题被回答声望记录
@@ -338,7 +338,7 @@ public class QuestionService extends EntityService<Question> {
 			repu2.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			repu2.setUserId(ans.getQuestion().getUserId());
 			repu2.setValue(maps.get(KbbConstants.Stragety_QuestionBeAnswer));	
-			repu2.setAnswersId(ans.getAnswersId());
+			repu2.setAnswerId(ans.getAnswerId());
 			repus.add(repu2);
 			// 插入声望记录
 			dao().insert(repus);
@@ -357,9 +357,9 @@ public class QuestionService extends EntityService<Question> {
 		// 自问自答问题标签积分不累积
 		// 回答问题标签积分只记录第一次
 		if(!ans.getQuestion().getUserId().equals(ans.getUserId())){
-			int count = dao().count(Answers.class, Cnd.where("userId", "=", ans.getUserId()).and("questionId","=",ans.getQuestionId()));
+			int count = dao().count(Answer.class, Cnd.where("userId", "=", ans.getUserId()).and("questionId","=",ans.getQuestionId()));
 			if(count<2){
-				User u = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userId", "=", answers.getUserId())), "userTags");
+				User u = dao().fetchLinks(dao().fetch(User.class, Cnd.where("userId", "=", answer.getUserId())), "userTags");
 				String[] tags = question.getTags().split(",");
 				List<UserTags> uts = u.getUserTags();
 				List<UserTags> unUts = new ArrayList<UserTags>();

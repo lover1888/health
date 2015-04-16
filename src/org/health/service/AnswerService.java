@@ -14,8 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.health.model.Answers;
-import org.health.model.AnswersComments;
+import org.health.model.Answer;
+import org.health.model.AnswerComment;
 import org.health.model.Question;
 import org.health.model.Reputation;
 import org.health.model.User;
@@ -43,15 +43,15 @@ import org.nutz.service.EntityService;
  * @date 2015年4月8日 上午10:59:05
  */
 @IocBean(fields={"dao"})
-public class AnswerService extends EntityService<Answers> {
+public class AnswerService extends EntityService<Answer> {
 	
 	
 	@Aop(TransAop.READ_COMMITTED)
-	public int saveAnswerComments(AnswersComments comment){
+	public int saveAnswerComments(AnswerComment comment){
 		// 插入
-		AnswersComments cmnt = dao().insert(comment);
+		AnswerComment cmnt = dao().insert(comment);
 		// 更新问题评论数
-		dao().update(Answers.class, Chain.makeSpecial("commentCount", "+1"), Cnd.where("answersId", "=", comment.getAnswersId()));
+		dao().update(Answer.class, Chain.makeSpecial("commentCount", "+1"), Cnd.where("answerId", "=", comment.getAnswerId()));
 		
 		return cmnt==null?0:1;
 	}
@@ -72,7 +72,7 @@ public class AnswerService extends EntityService<Answers> {
 				CommentsVo vo;
 				while(rs.next()) {
 					vo = new CommentsVo();
-					vo.setAnswersComments((AnswersComments)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setAnswerComment((AnswerComment)entity.getObject(rs, context.getFieldMatcher(), null));
 					vo.setUserName(rs.getString("userName"));
 					vo.setReputation(rs.getInt("reputationCount"));
 					vo.setImgUrl(rs.getString("imageUrl"));
@@ -82,9 +82,9 @@ public class AnswerService extends EntityService<Answers> {
 			}
 		};
 		
-		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_answers_comments qc, tb_user u where qc.answersId=@q1 and qc.userId=u.userId;");
+		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_answer_comment qc, tb_user u where qc.answerId=@q1 and qc.userId=u.userId;");
 		sql.params().set("q1", answerId);
-		sql.setEntity(dao().getEntity(AnswersComments.class));
+		sql.setEntity(dao().getEntity(AnswerComment.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
 		return sql.getList(CommentsVo.class);
@@ -94,7 +94,7 @@ public class AnswerService extends EntityService<Answers> {
 	@Aop(TransAop.READ_COMMITTED)
 	public void adoptAnswer(String answerId, String userId, String act) throws Exception{
 		// 先找出这个答案
-		Answers ans = dao().fetchLinks(dao().fetch(Answers.class, Cnd.where("answersId", "=", answerId)),"question");
+		Answer ans = dao().fetchLinks(dao().fetch(Answer.class, Cnd.where("answerId", "=", answerId)),"question");
 		if(Lang.isEmpty(ans)){
 			throw Lang.makeThrow("操作失败，没有这个答案", new Object[0]);
 		}
@@ -130,7 +130,7 @@ public class AnswerService extends EntityService<Answers> {
 				repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 				repu.setUserId(q.getUserId());
 				repu.setValue(maps.get(KbbConstants.Stragety_AnswerAdopt));
-				repu.setAnswersId(ans.getAnswersId());
+				repu.setAnswerId(ans.getAnswerId());
 				dao().insert(repu);
 				// 采纳者声望值
 				User u1 = dao().fetch(User.class, Cnd.where("userId", "=", q.getUserId()));
@@ -146,7 +146,7 @@ public class AnswerService extends EntityService<Answers> {
 				repu2.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 				repu2.setUserId(ans.getUserId());
 				repu2.setValue(maps.get(KbbConstants.Stragety_AnswerBeAdopt));
-				repu2.setAnswersId(ans.getAnswersId());
+				repu2.setAnswerId(ans.getAnswerId());
 				dao().insert(repu2);
 				User u2 = dao().fetch(User.class, Cnd.where("userId", "=", ans.getUserId()));
 				u2.setReputationCount(u2.getReputationCount()+maps.get(KbbConstants.Stragety_AnswerBeAdopt));
@@ -215,13 +215,13 @@ public class AnswerService extends EntityService<Answers> {
 	 */
 	@Aop(TransAop.READ_COMMITTED)
 	public void voteAnswer(String answerId, String voteType, String userId) throws Exception{
-		Answers a = dao().fetchLinks(dao().fetch(Answers.class, Cnd.where("answersId", "=", answerId)),"question");
+		Answer a = dao().fetchLinks(dao().fetch(Answer.class, Cnd.where("answerId", "=", answerId)),"question");
 		// 不能对自己的回答投票
 		if(a.getUserId().equals(userId)){
 			throw Lang.makeThrow("不能对自己的回答投票", new Object[0]);
 		}
 		// 检测是否已经投过票
-		UserVote uvote = dao().fetch(UserVote.class, Cnd.where("userId", "=", userId).and("sourceId","=",answerId).and("sourceType", "=", KbbConstants.SourceType.ANSWERS.getValue()));
+		UserVote uvote = dao().fetch(UserVote.class, Cnd.where("userId", "=", userId).and("sourceId","=",answerId).and("sourceType", "=", KbbConstants.SourceType.ANSWER.getValue()));
 		if(uvote!=null) {
 			throw Lang.makeThrow("您已经对答案投过票", new Object[0]);
 		}
@@ -237,7 +237,7 @@ public class AnswerService extends EntityService<Answers> {
 			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			repu.setUserId(a.getUserId());
 			repu.setValue(maps.get(KbbConstants.Stragety_AnswerBeVoteAdd));
-			repu.setAnswersId(a.getAnswersId());
+			repu.setAnswerId(a.getAnswerId());
 			dao().insert(repu);
 			
 			// 更新被赞同答案的用户声望数
@@ -249,8 +249,8 @@ public class AnswerService extends EntityService<Answers> {
 			// 插入用户投票记录
 			UserVote uv = new UserVote();
 			uv.setId(KbbUtils.generateID());
-			uv.setSourceId(a.getAnswersId());
-			uv.setSourceType(KbbConstants.SourceType.ANSWERS.getValue());
+			uv.setSourceId(a.getAnswerId());
+			uv.setSourceType(KbbConstants.SourceType.ANSWER.getValue());
 			uv.setUserId(userId);
 			uv.setVoteType(KbbConstants.ActType_Add);
 			dao().insert(uv);
@@ -272,7 +272,7 @@ public class AnswerService extends EntityService<Answers> {
 			repu.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			repu.setUserId(a.getUserId());
 			repu.setValue(maps.get(KbbConstants.Stragety_AnswerBeVoteReduce));
-			repu.setAnswersId(a.getAnswersId());
+			repu.setAnswerId(a.getAnswerId());
 			//更新被反对答案用户的声望数
 			User u1 = dao().fetch(User.class, Cnd.where("userId", "=", a.getUserId()));
 			u1.setReputationCount(u1.getReputationCount()+maps.get(KbbConstants.Stragety_AnswerBeVoteReduce));
@@ -288,7 +288,7 @@ public class AnswerService extends EntityService<Answers> {
 			repu2.setSourceType(KbbConstants.SourceType.QUESTION.getValue());
 			repu2.setUserId(userId);
 			repu2.setValue(maps.get(KbbConstants.Stragety_AnswerVoteReduce));
-			repu2.setAnswersId(a.getAnswersId());
+			repu2.setAnswerId(a.getAnswerId());
 			
 			// 更新反对者用户声望
 			User u2 = dao().fetch(User.class, Cnd.where("userId", "=", userId));
@@ -300,8 +300,8 @@ public class AnswerService extends EntityService<Answers> {
 			// 插入用户投票记录
 			UserVote uv = new UserVote();
 			uv.setId(KbbUtils.generateID());
-			uv.setSourceId(a.getAnswersId());
-			uv.setSourceType(KbbConstants.SourceType.ANSWERS.getValue());
+			uv.setSourceId(a.getAnswerId());
+			uv.setSourceType(KbbConstants.SourceType.ANSWER.getValue());
 			uv.setUserId(userId);
 			uv.setVoteType(KbbConstants.ActType_Reduce);
 			dao().insert(uv);

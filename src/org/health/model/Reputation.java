@@ -28,7 +28,7 @@ public class Reputation {
 	private String sourceId;
 	private Date createDate = new Date();
 	private String sourceType;
-	private String answersId;
+	private String answerId;
 	private String sourceTitle;
 
 	/**
@@ -76,19 +76,14 @@ public class Reputation {
 		this.sourceType = sourceType;
 	}
 
-	/**
-	 * @return the answersId
-	 */
-	public String getAnswersId() {
-		return answersId;
+	
+
+	public String getAnswerId() {
+		return answerId;
 	}
 
-	/**
-	 * @param answersId
-	 *            the answersId to set
-	 */
-	public void setAnswersId(String answersId) {
-		this.answersId = answersId;
+	public void setAnswerId(String answerId) {
+		this.answerId = answerId;
 	}
 
 	/**
