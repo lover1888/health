@@ -10,7 +10,7 @@ package org.health.vo;
 import java.util.List;
 
 import org.health.model.Answers;
-import org.health.model.Comments;
+import org.health.model.QuestionComments;
 
 /**
  * @Description TODO
@@ -21,7 +21,7 @@ public class AnswerVo extends BaseVo {
 
 	private Answers answers;
 
-	private List<Comments> comments;
+	private List<QuestionComments> comments;
 
 	/**
 	 * @return the answers
@@ -41,7 +41,7 @@ public class AnswerVo extends BaseVo {
 	/**
 	 * @return the comments
 	 */
-	public List<Comments> getComments() {
+	public List<QuestionComments> getComments() {
 		return comments;
 	}
 
@@ -49,7 +49,7 @@ public class AnswerVo extends BaseVo {
 	 * @param comments
 	 *            the comments to set
 	 */
-	public void setComments(List<Comments> comments) {
+	public void setComments(List<QuestionComments> comments) {
 		this.comments = comments;
 	}
 

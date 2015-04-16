@@ -20,7 +20,7 @@
 	<tr>
 		<td> ${q.voteCount} 投票</td>
 		<td>${q.answersCount }回答
-			<c:if test="${q.questionStatus==2}">
+			<c:if test="${q.questionStatus==1}">
 				<br>已解决
 			</c:if>
 		</td>

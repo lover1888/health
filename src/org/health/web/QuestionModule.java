@@ -7,6 +7,8 @@
  */
 package org.health.web;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.SecurityUtils;
@@ -15,19 +17,23 @@ import org.apache.shiro.subject.Subject;
 import org.health.common.page.Pagination;
 import org.health.model.Answers;
 import org.health.model.Question;
+import org.health.model.QuestionComments;
 import org.health.service.QuestionService;
 import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
+import org.health.vo.CommentsVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
+import org.nutz.lang.Lang;
 import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.View;
 import org.nutz.mvc.annotation.At;
+import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
 import org.nutz.mvc.view.ServerRedirectView;
@@ -112,7 +118,7 @@ public class QuestionModule {
 
 	// 回答问题
 	@At("/q/answer")
-	public View doQuestionAnswer(@Param("..") Answers answer) {
+	public View doAnswerQuestion(@Param("..") Answers answer) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
 		try {
@@ -123,6 +129,29 @@ public class QuestionModule {
 		
 		return new ViewWrapper(new ServerRedirectView("/q/"
 				+ answer.getQuestionId()), null);
+	}
+	
+	@At("/q/?/comment/list")
+	@Ok("json")
+	public List<CommentsVo> doGetQuestionComments(String questionId){
+		return this.questionService.getComments(questionId);
+	}
+	
+	@At("/q/comment")
+	@Fail("json")
+	public View doCommentQuestion(@Param("..") QuestionComments comment) {
+		// 检测是否有权限
+		try {
+			Subject subject = SecurityUtils.getSubject();
+			subject.checkPermission("question:comment");	
+		} catch (AuthorizationException e) {
+			throw Lang.makeThrow("您没有该权限", new Object[0]);
+		}
+		comment.setUserId(KbbUtils.getCurrentUserId());
+		this.questionService.saveQuestionComments(comment);
+		
+		return new ViewWrapper(new ServerRedirectView("/q/"
+				+ comment.getQuestionId()), null);
 	}
 	
 	// 问题投票（赞成，反对）用Ajax调用

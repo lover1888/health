@@ -7,10 +7,15 @@
  */
 package org.health.service;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.health.model.Answers;
+import org.health.model.AnswersComments;
 import org.health.model.Question;
 import org.health.model.Reputation;
 import org.health.model.User;
@@ -18,10 +23,15 @@ import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.util.ServiceUtils;
+import org.health.vo.CommentsVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
+import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
 import org.nutz.dao.Sqls;
+import org.nutz.dao.entity.Entity;
+import org.nutz.dao.impl.sql.callback.EntityCallback;
 import org.nutz.dao.sql.Sql;
+import org.nutz.dao.sql.SqlContext;
 import org.nutz.ioc.aop.Aop;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -34,6 +44,51 @@ import org.nutz.service.EntityService;
  */
 @IocBean(fields={"dao"})
 public class AnswerService extends EntityService<Answers> {
+	
+	
+	@Aop(TransAop.READ_COMMITTED)
+	public int saveAnswerComments(AnswersComments comment){
+		// 插入
+		AnswersComments cmnt = dao().insert(comment);
+		// 更新问题评论数
+		dao().update(Answers.class, Chain.makeSpecial("commentCount", "+1"), Cnd.where("answersId", "=", comment.getAnswersId()));
+		
+		return cmnt==null?0:1;
+	}
+	
+	/**
+	 * 获取指定问题评论信息
+	 * @Description TODO
+	 * @param sourceId
+	 * @param sourceType
+	 * @return
+	 */
+	public List<CommentsVo> getComments(String answerId) {
+		EntityCallback callback = new EntityCallback(){
+			@Override
+			protected List<CommentsVo> process(ResultSet rs, Entity<?> entity,
+					SqlContext context) throws SQLException {
+				List<CommentsVo> vos = new ArrayList<CommentsVo>();
+				CommentsVo vo;
+				while(rs.next()) {
+					vo = new CommentsVo();
+					vo.setAnswersComments((AnswersComments)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setUserName(rs.getString("userName"));
+					vo.setReputation(rs.getInt("reputationCount"));
+					vo.setImgUrl(rs.getString("imageUrl"));
+					vos.add(vo);
+				}
+		        return vos;
+			}
+		};
+		
+		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_answers_comments qc, tb_user u where qc.answersId=@q1 and qc.userId=u.userId;");
+		sql.params().set("q1", answerId);
+		sql.setEntity(dao().getEntity(AnswersComments.class));
+		sql.setCallback(callback);
+		dao().execute(sql);
+		return sql.getList(CommentsVo.class);
+	}
 	
 	// 采纳答案
 	@Aop(TransAop.READ_COMMITTED)

@@ -37,7 +37,7 @@ public class KbbConstants {
 		/**
 		 * 问题解答中
 		 */
-		QuestionOpen(1),
+		QuestionOpen(0),
 		
 		/**
 		 * 问题已关闭
@@ -47,7 +47,7 @@ public class KbbConstants {
 		/**
 		 * 问题已解决
 		 */
-		QuestionResolved(2);
+		QuestionResolved(1);
 		
 		private int value;
 		Status(int value){

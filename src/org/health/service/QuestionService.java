@@ -18,8 +18,8 @@ import java.util.Set;
 
 import org.health.common.page.Pagination;
 import org.health.model.Answers;
-import org.health.model.Comments;
 import org.health.model.Question;
+import org.health.model.QuestionComments;
 import org.health.model.Reputation;
 import org.health.model.Tags;
 import org.health.model.User;
@@ -29,6 +29,7 @@ import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.util.ServiceUtils;
 import org.health.vo.AnswerVo;
+import org.health.vo.CommentsVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
 import org.nutz.dao.Chain;
@@ -175,15 +176,48 @@ public class QuestionService extends EntityService<Question> {
 		return new Pagination<AnswerVo>(pageNum, pageSize, 0, sql.getList(AnswerVo.class));
 	}
 	
+	@Aop(TransAop.READ_COMMITTED)
+	public int saveQuestionComments(QuestionComments comment){
+		// 插入
+		QuestionComments cmnt = dao().insert(comment);
+		// 更新问题评论数
+		dao().update(Question.class, Chain.makeSpecial("commentCount", "+1"), Cnd.where("questionId", "=", comment.getQuestionId()));
+		
+		return cmnt==null?0:1;
+	}
+	
 	/**
-	 * 获取评论信息
+	 * 获取指定问题评论信息
 	 * @Description TODO
 	 * @param sourceId
 	 * @param sourceType
 	 * @return
 	 */
-	public List<Comments> getComments(String sourceId, String sourceType) {
-		return dao().query(Comments.class, Cnd.where("sourceId", "=", sourceId).and("sourceType","=",sourceType));
+	public List<CommentsVo> getComments(String questionId) {
+		EntityCallback callback = new EntityCallback(){
+			@Override
+			protected List<CommentsVo> process(ResultSet rs, Entity<?> entity,
+					SqlContext context) throws SQLException {
+				List<CommentsVo> vos = new ArrayList<CommentsVo>();
+				CommentsVo vo;
+				while(rs.next()) {
+					vo = new CommentsVo();
+					vo.setQuestionComments((QuestionComments)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo.setUserName(rs.getString("userName"));
+					vo.setReputation(rs.getInt("reputationCount"));
+					vo.setImgUrl(rs.getString("imageUrl"));
+					vos.add(vo);
+				}
+		        return vos;
+			}
+		};
+		
+		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_question_comments qc, tb_user u where qc.questionId=@q1 and qc.userId=u.userId;");
+		sql.params().set("q1", questionId);
+		sql.setEntity(dao().getEntity(QuestionComments.class));
+		sql.setCallback(callback);
+		dao().execute(sql);
+		return sql.getList(CommentsVo.class);
 	}
 	
 	/**
@@ -368,10 +402,10 @@ public class QuestionService extends EntityService<Question> {
 		if(u.getFocusQuestions().size()<1){
 			u.setFocusQuestions(Arrays.asList(ans.getQuestion()));
 			dao().insertRelation(u, "focusQuestions");
+			// 问题的关注数增加
+			question.setFocusCount(question.getFocusCount()+1);
+			dao().update(question);
 		}
-		// 问题的关注数增加
-		question.setFocusCount(question.getFocusCount()+1);
-		dao().update(question);
 		
 		// 发送通知到关注该问题的人
 		// TODO

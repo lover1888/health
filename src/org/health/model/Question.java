@@ -49,9 +49,25 @@ public class Question {
 
 	@Many(target = Answers.class, field = "questionId")
 	private List<Answers> answers;
+	
+	@Many(target = QuestionComments.class, field="questionId")
+	private List<QuestionComments> questionComments;
+	
+	
+	/**  
+	 * @return the questionComments  
+	 */
+	public List<QuestionComments> getQuestionComments() {
+		return questionComments;
+	}
 
-	
-	
+	/**  
+	 * @param questionComments the questionComments to set  
+	 */
+	public void setQuestionComments(List<QuestionComments> questionComments) {
+		this.questionComments = questionComments;
+	}
+
 	public int getVoteAddCount() {
 		return voteAddCount;
 	}

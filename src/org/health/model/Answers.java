@@ -8,7 +8,9 @@
 package org.health.model;
 
 import java.util.Date;
+import java.util.List;
 
+import org.nutz.dao.entity.annotation.Many;
 import org.nutz.dao.entity.annotation.Name;
 import org.nutz.dao.entity.annotation.One;
 import org.nutz.dao.entity.annotation.Readonly;
@@ -42,9 +44,24 @@ public class Answers {
 	private boolean isIgnore;
 	private boolean isComplaints;
 	private int flag;
+	
+	@Many(target=AnswersComments.class, field="answersId")
+	private List<AnswersComments> answersComments;
+	
+	/**  
+	 * @return the answersComments  
+	 */
+	public List<AnswersComments> getAnswersComments() {
+		return answersComments;
+	}
 
-	
-	
+	/**  
+	 * @param answersComments the answersComments to set  
+	 */
+	public void setAnswersComments(List<AnswersComments> answersComments) {
+		this.answersComments = answersComments;
+	}
+
 	public int getVoteAddCount() {
 		return voteAddCount;
 	}
