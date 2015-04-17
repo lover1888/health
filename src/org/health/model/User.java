@@ -31,7 +31,7 @@ public class User {
 
 	private String userName;
 
-	private String sex;
+	private int sex;
 	private Date birthday;
 	private String city;
 	private String address;
@@ -46,8 +46,8 @@ public class User {
 	private int fansCount;
 	private int praiseCount;
 	private String introduce;
-	private Date createDate;
-	private Date updateDate;
+	private Date createDate = new Date();
+	private Date updateDate = new Date();
 	private boolean isDoctor;
 	private String personName;
 	private int flag;
@@ -159,7 +159,7 @@ public class User {
 	/**
 	 * @return the sex
 	 */
-	public String getSex() {
+	public int getSex() {
 		return sex;
 	}
 
@@ -167,7 +167,7 @@ public class User {
 	 * @param sex
 	 *            the sex to set
 	 */
-	public void setSex(String sex) {
+	public void setSex(int sex) {
 		this.sex = sex;
 	}
 

@@ -16,20 +16,15 @@ public class KbbConstants {
 	
 	public static String SESSION_USER_ID = "userId";
 	
-	/**
-	 * 投赞同票
-	 */
-//	public static String VoteType_Add = "1";
-	/**
-	 * 投反对票
-	 */
-//	public static String VoteType_Reduce = "0";
-	// 关注
+	// 关注、赞同票
 	public static String ActType_Add = "1";
-	// 取消关注
+	// 取消关注、反对票
 	public static String ActType_Reduce = "0";
 	
-	
+	public static int Flag_Normal = 0;
+	public static int Flag_Delete = -1;
+	//注册用户未激活状态
+	public static int Flag_UnActive = -2;
 	
 	
 	// 状态

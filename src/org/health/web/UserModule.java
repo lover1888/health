@@ -48,8 +48,18 @@ public class UserModule {
 	}
 	
 	@At("/register")
-	public void doRegister(){
-		
+	public void doRegister(@Param("..") User user, HttpServletRequest req){
+		this.userService.register(user, req);
+	}
+	@At("/register/?/confirm/?")
+	public void doRegisterConfirm(String userId, long time){
+		long be = System.currentTimeMillis() - time;
+		if(be>3600000){
+			this.userService.registerConfirm(userId, KbbConstants.Flag_Delete);
+			throw Lang.makeThrow("激活已经过期，请重新注册。", new Object[0]);
+		} else {
+			this.userService.registerConfirm(userId, KbbConstants.Flag_Normal);
+		}
 	}
 	
 	@At("/logout")
