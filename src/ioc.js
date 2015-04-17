@@ -6,6 +6,17 @@ var ioc = {
             paths : ["conf.properties"]
         }
     },
+    mailSender:{
+    	type:"org.health.util.MailSender",
+    	args:[
+    	      	{java :"$config.get('mail-from')"},
+    	      	{java :"$config.get('mail-fromNick')"},
+    	      	{java :"$config.get('mail-userName')"},
+    	      	{java :"$config.get('mail-password')"},
+    	      	{java :"$config.get('mail-smtpHost')"}
+    	      ],
+    },
+    
     // 数据源
     dataSource : {
         type :"com.alibaba.druid.pool.DruidDataSource",

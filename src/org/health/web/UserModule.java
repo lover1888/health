@@ -19,6 +19,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.health.model.User;
 import org.health.service.UserService;
 import org.health.util.KbbConstants;
+import org.health.util.MailSender;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -38,14 +39,19 @@ public class UserModule {
 	@Inject
 	private UserService userService; 
 	
+	@Inject
+	private MailSender mailSender;
+	
 	@At("/login")
 	@Ok("jsp:jsp.login")
 	public void doLogin(){
-//		 Subject subject = SecurityUtils.getSubject();  
-//		 ThreadContext.bind(subject);
-//		 UsernamePasswordToken token = new UsernamePasswordToken(userName, password);
-//		 subject.login(token);
 	}
+	
+	@At("/register")
+	public void doRegister(){
+		
+	}
+	
 	@At("/logout")
 	@Ok("redirect:/question")
 	public void doLogout(){
@@ -64,6 +70,8 @@ public class UserModule {
 			subject.login(token);
 			User u = this.userService.findUser(userName);
 			subject.getSession().setAttribute(KbbConstants.SESSION_USER_ID, u.getUserId());
+			
+//			this.mailSender.sendText("hengfei.jin@kaihuahealth.com", "登录", "["+userName+"]登录了。");
 		 }catch(UnknownAccountException e){
 			 req.setAttribute("errmsg", "帐号不存在");
 			 throw Lang.makeThrow("帐号不存在", new Object[0]);
