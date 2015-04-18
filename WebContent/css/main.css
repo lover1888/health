@@ -1,0 +1,13 @@
+.kbb-item {
+	width: 60px; 
+	text-align: center;
+}
+
+.kbb-itemcontent {
+	text-align: left;
+	vertical-align: middle;
+}
+
+.kbb-hr {
+	filter: alpha(opacity=100,finishopacity=0,style=3) color=#987cb9 SIZE=3
+}

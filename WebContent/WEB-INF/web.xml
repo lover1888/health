@@ -24,18 +24,15 @@
     </init-param>
     <init-param>
         <param-name>ignore</param-name>
-        <param-value>^(.+[.])(jsp|png|gif|jpg|js|css|jspx|jpeg|html)$</param-value>
+        <param-value>^(.+[.])(jsp|ico|png|gif|jpg|js|css|jspx|jpeg|html)$</param-value>
     </init-param>
   </filter>
   <filter-mapping>
     <filter-name>nutz</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  
-  	
-  
   <welcome-file-list>
-       <welcome-file>index.jsp</welcome-file>
+       <welcome-file>main.jsp</welcome-file>
   </welcome-file-list>
   
   <!-- 默认的错误处理页面 -->  
