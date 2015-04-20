@@ -1,11 +1,43 @@
 .kbb-item {
-	width: 60px; 
+	
+	width: 50px; 
 	text-align: center;
+}
+.kbb-item-answer {
+	background:#008866;
+	font-size:10px;
+	color:#fff;
+	height:40px;
+	width: 40px; 
+	text-align: center;
+	vertical-align: middle;
+}
+.kbb-item-answered {
+	background:#A9A9A9;
+	font-size:10px;
+	color:#fff;
+	height:40px;
+	width: 40px; 
+	text-align: center;
+	vertical-align: middle;
+}
+.kbb-item-unanswer {
+	background:#8B0000;
+	font-size:10px;
+	color:#fff;
+	height:40px;
+	width: 40px; 
+	text-align: center;
+	vertical-align: middle;
 }
 
 .kbb-itemcontent {
 	text-align: left;
 	vertical-align: middle;
+}
+
+.kbb-q {
+	
 }
 
 .kbb-hr {

@@ -13,14 +13,17 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap/bootstrap-theme.min.css" rel="stylesheet">
     <link href="css/main.css" rel="stylesheet">
-    <script src="js/jquery-1.10.2.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="js/jquery-1.11.2.min.js"></script>
     <script src="js/bootstrap/bootstrap.min.js"></script>
   </head>
   <body>
-  <div class="alert alert-warning alert-dismissible" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  <strong>Warning!</strong> Better check yourself, you're not looking too good.
-</div>
+
   <div class="container">
 	<nav class="navbar navbar-default">
 	  <div class="container-fluid">
@@ -71,13 +74,20 @@
 				  消息<span class="badge">1</span>
 				</button>
 	        </li>
-	        <li><button type="button" class="btn btn-primary navbar-btn">立即登录</button></li>
+	        <li><button type="button" class="btn btn-primary navbar-btn"  data-toggle="modal" data-target="#loginModal">立即登录</button></li>
+	        
+	        <jsp:include page="/WEB-INF/bsplugin/loginmodal.jsp"></jsp:include>
+	        
+	        
 	      </ul>
 	    </div><!-- /.navbar-collapse -->
 	  </div><!-- /.container-fluid -->
-	</nav>  
+	</nav>
+	
+	  
     <div class="row">
     	<div class="col-md-9">
+    		<div class="container-fluid">
     		 <h4>亲，您或您的家人和朋友哪儿不舒服呢？<button type="button" class="btn btn-primary navbar-btn">立即提问</button></h4>
 		    <div role="tabpanel">
 			  <!-- Nav tabs -->
@@ -109,6 +119,11 @@
 						  <td class="kbb-itemcontent">JavaEE 收费附件下载设计思路是什么 <span class="label label-success">内科</span></td>
 						</tr>
 					</table>
+					<div class="alert alert-warning alert-dismissible" role="alert">
+					  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					  <strong>Warning!</strong> Better check yourself, you're not looking too good.
+					</div>
+				
 					<nav style="text-align: center;">
 					  <ul class="pagination ">
 					    <li class="disabled">
@@ -150,10 +165,12 @@
 			  </script>
 			</div>
     	</div>
-    	
+    	</div>
     	<div class="col-md-3">
+    	
+   		<div class="container-fluid">
     		<div class="well">
-    			<h4>最专业的医生声望榜</h4>
+    			<h4>最可信的医生声望榜</h4>
     			<p>最直接的病情咨询</p>
     			<p>最真诚的病友交流</p>
     		</div>
@@ -165,7 +182,7 @@
 		    <a href="#" class="list-group-item">邀请我回答的</a>
 		    <a href="#" class="list-group-item">邀请朋友加入</a>
 		  </ul>
-		  
+
 		  <div class="panel panel-default">
 			  <div class="panel-heading">
 			    <h3 class="panel-title">关注 3 个标签</h3>
@@ -176,7 +193,7 @@
 			  	<a href=""><span class="label label-success">外科</span></a>
 			  	<span class="label label-success">神经内科</span></h4>
 		  	  </div>
-			</div>
+		  </div>
 			<div class="panel panel-default">
 			  <div class="panel-heading">
 			  	<h3 class="panel-title">热门标签</h3>
@@ -185,7 +202,6 @@
 			  	<h4><span class="label label-success">内科</span>
 			  	<span class="label label-success">外科</span>
 			  	<span class="label label-success">神经内科</span>
-			  	<button type="button" class="btn btn-success btn-xs">牙 科</button>
 			  	</h4>
 		  	  </div>
 			</div>
@@ -200,12 +216,11 @@
 			</div>
 			
 			<div class="center-block">居中显示 吗？</div>
-			
-			
+			</div>
     	</div>
     </div>
   </div>
-  
+
   <div class="container">
   	<hr class="kbb-hr">
   	<p></p>

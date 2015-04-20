@@ -16,7 +16,7 @@
   <body>
     <h1>模板文件</h1>
 
-    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-1.11.2.min.js"></script>
     <script src="js/bootstrap/bootstrap.min.js"></script>
   </body>
 </html>

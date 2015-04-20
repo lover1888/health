@@ -26,7 +26,7 @@
 		</td>
 		<td>${q.viewCount }浏览</td>
 		<td>
-		<a href="<c:url value='/q/${q.questionId }' /> ">${q.title}</a> 
+		<a href="<c:url value='/q/${q.questionId }'/>">${q.title}</a> 
 		--
 		<fmt:formatDate value="${q.createDate }" pattern="MM-dd HH:mm"/>
 		</td>

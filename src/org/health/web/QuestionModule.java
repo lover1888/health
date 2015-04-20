@@ -57,7 +57,7 @@ public class QuestionModule {
 
 	// 问题列表
 	@At("/question/*")
-	@Ok("jsp:jsp.question.questions")
+	@Ok("jsp:jsp.question.questions2")
 	public void doGetQuestions(String type, int page, HttpServletRequest req) {
 		if (Strings.isEmpty(type)) {
 			type = "newest";

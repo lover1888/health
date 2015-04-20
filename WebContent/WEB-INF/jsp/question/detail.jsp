@@ -4,9 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>看病吧--问答详情</title>
-<script src="${baseURI }/js/jquery-1.10.2.js"></script>
-<link rel="stylesheet" href="${baseURI }/css/ui-dialog.css">
-<script src="${baseURI }/js/dialog.js"></script>
+<jsp:include page="/WEB-INF/jsp/head.jsp"></jsp:include>
 </head>
 <body>
 <%@ include file="/WEB-INF/jsp/top.jsp" %>

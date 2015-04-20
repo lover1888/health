@@ -26,13 +26,21 @@
         <param-name>ignore</param-name>
         <param-value>^(.+[.])(jsp|ico|png|gif|jpg|js|css|jspx|jpeg|html)$</param-value>
     </init-param>
+    <init-param>
+        <param-name>exclusions</param-name>
+        <!-- *.XXX 忽略后缀 -->
+        <!-- /XX/* 忽略前缀 -->
+        <!-- /cc   忽略固定路径 -->
+        <!-- 下面的例子忽略了html和ftl后缀, 忽略了/rs/和/druid/前缀,和忽略了固定路径/abc/notaction -->
+        <param-value>*.html,*.ftl,/css/fonts/*,/druid/*</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>nutz</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <welcome-file-list>
-       <welcome-file>main.jsp</welcome-file>
+       <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
   
   <!-- 默认的错误处理页面 -->  
