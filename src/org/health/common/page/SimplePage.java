@@ -98,7 +98,7 @@ public class SimplePage implements Paginable {
 	 * 总共几页
 	 */
 	public int getTotalPage() {
-		int totalPage = totalCount / pageSize;
+		totalPage = totalCount / pageSize;
 		if (totalPage == 0 || totalCount % pageSize != 0) {
 			totalPage++;
 		}
@@ -144,6 +144,7 @@ public class SimplePage implements Paginable {
 	protected int totalCount = 0;
 	protected int pageSize = 20;
 	protected int pageNo = 1;
+	protected int totalPage = 1;
 
 	/**
 	 * if totalCount<0 then totalCount=0

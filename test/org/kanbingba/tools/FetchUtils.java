@@ -62,9 +62,9 @@ public class FetchUtils {
 				"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8) AppleWebKit/536.25 (KHTML, like Gecko) Version/6.0 Safari/536.25",
 				"Mozilla/5.0(iPad; U; CPU iPhone OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B314 Safari/531.21.10" };
 		int k = new Random().nextInt(agents.length);
-		System.out.println("k=" + k + ">>>" + agents[k]);
+//		System.out.println("k=" + k + ">>>" + agents[k]);
 		try {
-			Thread.sleep((k == 0 ? 1 : k) * 1000);
+			Thread.sleep((k == 0 ? 1 : k) * 100);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}

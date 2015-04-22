@@ -22,13 +22,24 @@
 		    <div role="tabpanel">
 			  <!-- Nav tabs -->
 			  <ul class="nav nav-tabs" role="tablist" id="myTab">
-			    <li role="presentation" class="active"><a href="#newest" aria-controls="newest" role="tab" data-toggle="tab"><strong>最新的</strong></a></li>
-			    <li role="presentation"><a href="#hottest" aria-controls="hottest" role="tab" data-toggle="tab"><strong>热门的</strong></a></li>
-			    <li role="presentation"><a href="#unanswered" aria-controls="unanswered" role="tab" data-toggle="tab"><strong>未回答</strong></a></li>
+			    <li role="presentation" <c:if test="${type=='newest' }">class="active"</c:if> > <a href="#newest" onclick="changeTab('newest');" aria-controls="newest" role="tab" data-toggle="tab"><strong>最新的</strong></a></li>
+			    <li role="presentation" <c:if test="${type=='hottest' }">class="active"</c:if> ><a href="#hottest" onclick="changeTab('hottest');" aria-controls="hottest" role="tab" data-toggle="tab"><strong>热门的</strong></a></li>
+			    <li role="presentation" <c:if test="${type=='unanswered' }">class="active"</c:if> > <a href="#unanswered" onclick="changeTab('unanswered');" aria-controls="unanswered" role="tab" data-toggle="tab"><strong>未回答</strong></a></li>
 			  </ul>
+			  <script type="text/javascript">
+			  	function changeTab(type){
+			  		window.location.href="${baseURI}/question/"+type;
+			  		//$('#'+type).html($('#tableContent').html());
+			  		alert($('#'+type).html());
+			  		//$('tableContent').show();
+			  	}
+			  </script>
+			 
+			  
 			  <!-- Tab panes -->
 			  <div class="tab-content">
-			    <div role="tabpanel" class="tab-pane active" id="newest">
+			    <div role="tabpanel" class="tab-pane <c:if test="${type=='newest' }">active</c:if>" id="newest">
+			    	 <span id="tableContent">
 					<table class="table table-striped">
 						<c:forEach items="${pagination.list }" var="q">
 							<tr>
@@ -36,7 +47,6 @@
 							  	${q.voteCount}<br>投票
 							  </td>
 							  <td class="kbb-item">
-							  	
 								  	<c:choose>
 								  		<c:when test="${q.questionStatus==1}">
 								  			<div class="kbb-item-answered">
@@ -70,25 +80,24 @@
 							</tr>
 						</c:forEach>
 					</table>
+					</span>
+					<!-- 
 					<div class="alert alert-warning alert-dismissible" role="alert">
 					  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					  <strong>Warning!</strong> Better check yourself, you're not looking too good.
 					</div>
-				
+				 	-->
 					<nav style="text-align: center;">
 					  <ul class="pagination ">
-					    <li class="disabled">
+					    <li <c:if test="${pagination.pageNo==1 }"> class="disabled"</c:if>>
 					      <a href="#" aria-label="Previous">
 					        <span aria-hidden="true">&laquo;</span>
 					      </a>
 					    </li>
-					    <li class="active"><a href="#">1</a></li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">5</a></li>
-					    <li><a href="#">...</a></li>
-					    <li>
+					    <c:forEach var="k" begin="1" end="${pagination.totalPage}">
+						    <li <c:if test="${pagination.pageNo==k}"> class="active"</c:if>><a href="#">${k }</a></li>
+					    </c:forEach>
+					    <li <c:if test="${pagination.pageNo>=pagination.totalPage }"> class="disabled"</c:if>>
 					      <a href="#" aria-label="Next">
 					        <span aria-hidden="true">&raquo;</span>
 					      </a>
@@ -96,7 +105,7 @@
 					  </ul>
 					</nav>
 				</div>
-			    <div role="tabpanel" class="tab-pane" id="hottest">
+			    <div role="tabpanel" class="tab-pane <c:if test="${type=='hottest' }">active</c:if>" id="hottest">
 					<ul class="list-group">
 					    <a href="#" class="list-group-item">我的草稿<span class="badge">2</span></a>
 					    <a href="#" class="list-group-item">我的收藏</a>
@@ -106,7 +115,7 @@
 					</ul>
 
 				</div>
-			    <div role="tabpanel" class="tab-pane" id="unanswered">未回答的</div>
+			    <div role="tabpanel" class="tab-pane <c:if test="${type=='unanswered' }">active</c:if>" id="unanswered">未回答的</div>
 			  </div>
 			  <script type="text/javascript">
 			 	 $('#myTab a').click(function (e) {

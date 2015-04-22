@@ -80,7 +80,7 @@ public class QuestionService extends EntityService<Question> {
 	 */
 	public Pagination<Question> getQuestionByHot(int pageNum, int pageSize) {
 		Pager pg = new Pager().setPageNumber(pageNum).setPageSize(pageSize);
-		List<Question> list = query(Cnd.where("answersCount", ">", 0).or("voteCount",">",0), pg);
+		List<Question> list = query(Cnd.where("answersCount", ">", 0).or("voteAddCount",">",0).or("voteReduceCount", ">", 0), pg);
 		return new Pagination<Question>(pageNum, pageSize, super.count(), list);
 	}
 	

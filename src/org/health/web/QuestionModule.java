@@ -62,6 +62,7 @@ public class QuestionModule {
 		if (Strings.isEmpty(type)) {
 			type = "newest";
 		}
+		req.setAttribute("type", type);
 		if (page <= 0) {
 			page = 1;
 		}
