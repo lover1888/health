@@ -28,94 +28,99 @@
 			  </ul>
 			  <script type="text/javascript">
 			  	function changeTab(type){
-			  		window.location.href="${baseURI}/question/"+type;
-			  		//$('#'+type).html($('#tableContent').html());
-			  		alert($('#'+type).html());
-			  		//$('tableContent').show();
+			  		window.location.href="${baseURI}/question/"+type;			  		
 			  	}
 			  </script>
-			 
+			 <span id="tableContent" style="display: none">
+						<table class="table table-striped">
+							<c:forEach items="${pagination.list }" var="q">
+								<tr>
+								  <td class="kbb-item">
+								  	${q.voteCount}<br>投票
+								  </td>
+								  <td class="kbb-item">
+									  	<c:choose>
+									  		<c:when test="${q.questionStatus==1}">
+									  			<div class="kbb-item-answered">
+										 		 ${q.answersCount }<br>
+									  			解决
+									  			</div>
+									  		</c:when>
+									  		<c:when test="${q.answersCount>0&&q.questionStatus!=1}">
+									  			<div class="kbb-item-answer">
+										 		 ${q.answersCount }<br>
+									  			回答
+									  			</div>
+									  		</c:when>
+									  		<c:otherwise>
+										  		<div class="kbb-item-unanswer">
+										 		 ${q.answersCount }<br>
+									  			回答
+									  			</div>
+									  		</c:otherwise>
+									  	</c:choose>
+									 </div>
+								  </td>
+								  <td class="kbb-item">${q.viewCount }<br>浏览</td>
+								  <td class="kbb-itemcontent">							  		
+								  		<h5><small>lover 2天前回答</small></h5>
+										<strong><a href="<c:url value='/q/${q.questionId }'/>">${q.title}</a></strong> -- <fmt:formatDate value="${q.createDate }" pattern="MM-dd HH:mm"/>
+										<c:forEach items="${fn:split(q.tags,',') }" var="tag">
+											<span class="label label-success">${tag }</span>
+										</c:forEach>
+								  </td>
+								</tr>
+							</c:forEach>
+						</table>
+						
+						<!-- 
+						<div class="alert alert-warning alert-dismissible" role="alert">
+						  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+						  <strong>Warning!</strong> Better check yourself, you're not looking too good.
+						</div>
+					 	-->
+						<nav style="text-align: center;">
+						  <ul class="pagination ">
+						    <li <c:if test="${pagination.pageNo==1 }"> class="disabled"</c:if>>
+						      <a href="#" aria-label="Previous">
+						        <span aria-hidden="true">&laquo;</span>
+						      </a>
+						    </li>
+						    <c:forEach var="k" begin="1" end="${pagination.totalPage}">
+							    <li <c:if test="${pagination.pageNo==k}"> class="active"</c:if>><a href="#">${k }</a></li>
+						    </c:forEach>
+						    <li <c:if test="${pagination.pageNo>=pagination.totalPage }"> class="disabled"</c:if>>
+						      <a href="#" aria-label="Next">
+						        <span aria-hidden="true">&raquo;</span>
+						      </a>
+						    </li>
+						  </ul>
+						</nav>
+					</span>
 			  
 			  <!-- Tab panes -->
 			  <div class="tab-content">
 			    <div role="tabpanel" class="tab-pane <c:if test="${type=='newest' }">active</c:if>" id="newest">
-			    	 <span id="tableContent">
-					<table class="table table-striped">
-						<c:forEach items="${pagination.list }" var="q">
-							<tr>
-							  <td class="kbb-item">
-							  	${q.voteCount}<br>投票
-							  </td>
-							  <td class="kbb-item">
-								  	<c:choose>
-								  		<c:when test="${q.questionStatus==1}">
-								  			<div class="kbb-item-answered">
-									 		 ${q.answersCount }<br>
-								  			解决
-								  			</div>
-								  		</c:when>
-								  		<c:when test="${q.answersCount>0&&q.questionStatus!=1}">
-								  			<div class="kbb-item-answer">
-									 		 ${q.answersCount }<br>
-								  			回答
-								  			</div>
-								  		</c:when>
-								  		<c:otherwise>
-									  		<div class="kbb-item-unanswer">
-									 		 ${q.answersCount }<br>
-								  			回答
-								  			</div>
-								  		</c:otherwise>
-								  	</c:choose>
-								 </div>
-							  </td>
-							  <td class="kbb-item">${q.viewCount }<br>浏览</td>
-							  <td class="kbb-itemcontent">							  		
-							  		<h5><small>lover 2天前回答</small></h5>
-									<strong><a href="<c:url value='/q/${q.questionId }'/>">${q.title}</a></strong> -- <fmt:formatDate value="${q.createDate }" pattern="MM-dd HH:mm"/>
-									<c:forEach items="${fn:split(q.tags,',') }" var="tag">
-										<span class="label label-success">${tag }</span>
-									</c:forEach>
-							  </td>
-							</tr>
-						</c:forEach>
-					</table>
-					</span>
-					<!-- 
-					<div class="alert alert-warning alert-dismissible" role="alert">
-					  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					  <strong>Warning!</strong> Better check yourself, you're not looking too good.
-					</div>
-				 	-->
-					<nav style="text-align: center;">
-					  <ul class="pagination ">
-					    <li <c:if test="${pagination.pageNo==1 }"> class="disabled"</c:if>>
-					      <a href="#" aria-label="Previous">
-					        <span aria-hidden="true">&laquo;</span>
-					      </a>
-					    </li>
-					    <c:forEach var="k" begin="1" end="${pagination.totalPage}">
-						    <li <c:if test="${pagination.pageNo==k}"> class="active"</c:if>><a href="#">${k }</a></li>
-					    </c:forEach>
-					    <li <c:if test="${pagination.pageNo>=pagination.totalPage }"> class="disabled"</c:if>>
-					      <a href="#" aria-label="Next">
-					        <span aria-hidden="true">&raquo;</span>
-					      </a>
-					    </li>
-					  </ul>
-					</nav>
+			      	<c:if test="${type=='newest' }">
+						<script type="text/javascript">
+							$('#newest').html($('#tableContent').html());
+						</script>
+					</c:if>
 				</div>
 			    <div role="tabpanel" class="tab-pane <c:if test="${type=='hottest' }">active</c:if>" id="hottest">
-					<ul class="list-group">
-					    <a href="#" class="list-group-item">我的草稿<span class="badge">2</span></a>
-					    <a href="#" class="list-group-item">我的收藏</a>
-					    <a href="#" class="list-group-item">我关注的问题</a>
-					    <a href="#" class="list-group-item">邀请我回答的</a>
-					    <a href="#" class="list-group-item">邀请朋友加入</a>
-					</ul>
-
+					<c:if test="${type=='hottest' }">
+						<script type="text/javascript">
+							$('#hottest').html($('#tableContent').html());
+						</script>
+					</c:if>
 				</div>
-			    <div role="tabpanel" class="tab-pane <c:if test="${type=='unanswered' }">active</c:if>" id="unanswered">未回答的</div>
+			    <div role="tabpanel" class="tab-pane <c:if test="${type=='unanswered' }">active</c:if>" id="unanswered">
+					<c:if test="${type=='unanswered' }">
+						<script type="text/javascript">
+							$('#unanswered').html($('#tableContent').html());
+						</script>
+					</c:if>
+				</div>
 			  </div>
 			  <script type="text/javascript">
 			 	 $('#myTab a').click(function (e) {
