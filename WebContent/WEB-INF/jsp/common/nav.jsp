@@ -50,9 +50,9 @@
       </form>
       <ul class="nav navbar-nav navbar-right">
         <li>
-	        <button class="btn btn-link navbar-btn btn-sm" type="button">
-			  消息<span class="badge">1</span>
-			</button>
+	        <button class="btn btn-default navbar-btn" type="button">
+  				<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <span class="badge">1</span>
+			</button>&nbsp;
         </li>
         <li><button type="button" class="btn btn-primary navbar-btn"  data-toggle="modal" data-target="#loginModal">立即登录</button></li>
         <jsp:include page="/WEB-INF/bsplugin/loginmodal.jsp"></jsp:include>

@@ -19,7 +19,7 @@ import org.health.service.AnswerService;
 import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
-import org.health.vo.CommentsVo;
+import org.health.vo.CommentVo;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
 import org.nutz.lang.Lang;
@@ -47,12 +47,12 @@ public class AnswerModule {
 	
 	@At("/answer/?/comment/list")
 	@Ok("json")
-	public List<CommentsVo> doGetAnswerComments(String answerId){
+	public List<CommentVo> doGetAnswerComments(String answerId){
 		return this.answerService.getComments(answerId);
 	}
 	@At("/answer/comment")
 	@Ok("json")
-	public List<CommentsVo> doCommentAnswer(@Param("..") AnswerComment comment) {
+	public List<CommentVo> doCommentAnswer(@Param("..") AnswerComment comment) {
 		// 检测是否有权限
 		try {
 			Subject subject = SecurityUtils.getSubject();

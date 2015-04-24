@@ -23,7 +23,7 @@ import org.health.model.UserVote;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.util.ServiceUtils;
-import org.health.vo.CommentsVo;
+import org.health.vo.CommentVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
 import org.nutz.dao.Chain;
 import org.nutz.dao.Cnd;
@@ -63,16 +63,17 @@ public class AnswerService extends EntityService<Answer> {
 	 * @param sourceType
 	 * @return
 	 */
-	public List<CommentsVo> getComments(String answerId) {
+	@SuppressWarnings("rawtypes")
+	public List<CommentVo> getComments(String answerId) {
 		EntityCallback callback = new EntityCallback(){
 			@Override
-			protected List<CommentsVo> process(ResultSet rs, Entity<?> entity,
+			protected List<CommentVo> process(ResultSet rs, Entity<?> entity,
 					SqlContext context) throws SQLException {
-				List<CommentsVo> vos = new ArrayList<CommentsVo>();
-				CommentsVo vo;
+				List<CommentVo> vos = new ArrayList<CommentVo>();
+				CommentVo<AnswerComment> vo;
 				while(rs.next()) {
-					vo = new CommentsVo();
-					vo.setAnswerComment((AnswerComment)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo = new CommentVo<AnswerComment>();
+					vo.setComment((AnswerComment)entity.getObject(rs, context.getFieldMatcher(), null));
 					vo.setUserName(rs.getString("userName"));
 					vo.setReputation(rs.getInt("reputationCount"));
 					vo.setImgUrl(rs.getString("imageUrl"));
@@ -87,7 +88,7 @@ public class AnswerService extends EntityService<Answer> {
 		sql.setEntity(dao().getEntity(AnswerComment.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
-		return sql.getList(CommentsVo.class);
+		return sql.getList(CommentVo.class);
 	}
 	
 	// 采纳答案

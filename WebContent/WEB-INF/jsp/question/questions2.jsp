@@ -73,29 +73,25 @@
 							</c:forEach>
 						</table>
 						
-						<!-- 
-						<div class="alert alert-warning alert-dismissible" role="alert">
-						  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-						  <strong>Warning!</strong> Better check yourself, you're not looking too good.
-						</div>
-					 	-->
-						<nav style="text-align: center;">
-						  <ul class="pagination ">
-						    <li <c:if test="${pagination.pageNo==1 }"> class="disabled"</c:if>>
-						      <a href="#" aria-label="Previous">
-						        <span aria-hidden="true">&laquo;</span>
-						      </a>
-						    </li>
-						    <c:forEach var="k" begin="1" end="${pagination.totalPage}">
-							    <li <c:if test="${pagination.pageNo==k}"> class="active"</c:if>><a href="#">${k }</a></li>
-						    </c:forEach>
-						    <li <c:if test="${pagination.pageNo>=pagination.totalPage }"> class="disabled"</c:if>>
-						      <a href="#" aria-label="Next">
-						        <span aria-hidden="true">&raquo;</span>
-						      </a>
-						    </li>
-						  </ul>
-						</nav>
+						<!-- c:if test="${pagination.totalPage>1}"-->
+							<nav style="text-align: center;">
+							  <ul class="pagination ">
+							    <li <c:if test="${pagination.pageNo==1 }"> class="disabled"</c:if>>
+							      <a href="#" aria-label="Previous">
+							        <span aria-hidden="true">&laquo;</span>
+							      </a>
+							    </li>
+							    <c:forEach var="k" begin="1" end="${pagination.totalPage}">
+								    <li <c:if test="${pagination.pageNo==k}"> class="active"</c:if>><a href="#">${k }</a></li>
+							    </c:forEach>
+							    <li <c:if test="${pagination.pageNo>=pagination.totalPage }"> class="disabled"</c:if>>
+							      <a href="#" aria-label="Next">
+							        <span aria-hidden="true">&raquo;</span>
+							      </a>
+							    </li>
+							  </ul>
+							</nav>
+						<!-- /c:if -->
 					</span>
 			  
 			  <!-- Tab panes -->
@@ -122,12 +118,6 @@
 					</c:if>
 				</div>
 			  </div>
-			  <script type="text/javascript">
-			 	 $('#myTab a').click(function (e) {
-				  //e.preventDefault();
-				  //$(this).tab('show');
-				});
-			  </script>
 			</div>
     	</div>
     	</div>

@@ -23,7 +23,7 @@ import org.health.service.StrategyService;
 import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.vo.AnswerVo;
-import org.health.vo.CommentsVo;
+import org.health.vo.CommentVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -104,7 +104,7 @@ public class QuestionModule {
 
 	// 问题详情
 	@At("/q/?")
-	@Ok("jsp:jsp.question.detail")
+	@Ok("jsp:jsp.question.detail2")
 	public void doGetQuestionDetail(String id, HttpServletRequest req) {
 		String userId = KbbUtils.getCurrentUserId();
 		QuestionDetailVo vo = this.questionService.getQuestionDetail(id, userId);
@@ -134,7 +134,7 @@ public class QuestionModule {
 	
 	@At("/q/?/comment/list")
 	@Ok("json")
-	public List<CommentsVo> doGetQuestionComments(String questionId){
+	public List<CommentVo> doGetQuestionComments(String questionId){
 		return this.questionService.getComments(questionId);
 	}
 	

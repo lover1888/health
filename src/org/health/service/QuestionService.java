@@ -29,7 +29,7 @@ import org.health.util.KbbConstants;
 import org.health.util.KbbUtils;
 import org.health.util.ServiceUtils;
 import org.health.vo.AnswerVo;
-import org.health.vo.CommentsVo;
+import org.health.vo.CommentVo;
 import org.health.vo.QuestionDetailVo;
 import org.nutz.aop.interceptor.ioc.TransAop;
 import org.nutz.dao.Chain;
@@ -193,16 +193,17 @@ public class QuestionService extends EntityService<Question> {
 	 * @param sourceType
 	 * @return
 	 */
-	public List<CommentsVo> getComments(String questionId) {
+	@SuppressWarnings("rawtypes")
+	public List<CommentVo> getComments(String questionId) {
 		EntityCallback callback = new EntityCallback(){
 			@Override
-			protected List<CommentsVo> process(ResultSet rs, Entity<?> entity,
+			protected List<CommentVo> process(ResultSet rs, Entity<?> entity,
 					SqlContext context) throws SQLException {
-				List<CommentsVo> vos = new ArrayList<CommentsVo>();
-				CommentsVo vo;
+				List<CommentVo> vos = new ArrayList<CommentVo>();
+				CommentVo<QuestionComment> vo;
 				while(rs.next()) {
-					vo = new CommentsVo();
-					vo.setQuestionComments((QuestionComment)entity.getObject(rs, context.getFieldMatcher(), null));
+					vo = new CommentVo<QuestionComment>();
+					vo.setComment((QuestionComment)entity.getObject(rs, context.getFieldMatcher(), null));
 					vo.setUserName(rs.getString("userName"));
 					vo.setReputation(rs.getInt("reputationCount"));
 					vo.setImgUrl(rs.getString("imageUrl"));
@@ -212,12 +213,12 @@ public class QuestionService extends EntityService<Question> {
 			}
 		};
 		
-		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_question_comments qc, tb_user u where qc.questionId=@q1 and qc.userId=u.userId;");
+		Sql sql = Sqls.create("SELECT u.userName, u.reputationCount, u.imageUrl, qc.* from tb_question_comment qc, tb_user u where qc.questionId=@q1 and qc.userId=u.userId;");
 		sql.params().set("q1", questionId);
 		sql.setEntity(dao().getEntity(QuestionComment.class));
 		sql.setCallback(callback);
 		dao().execute(sql);
-		return sql.getList(CommentsVo.class);
+		return sql.getList(CommentVo.class);
 	}
 	
 	/**
