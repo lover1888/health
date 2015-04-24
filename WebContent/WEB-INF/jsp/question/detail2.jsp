@@ -73,11 +73,11 @@
 												$('#commentDetail').append('<small>'+obj.comment.createDate+'</small>');
 												$('#commentDetail').append('&nbsp;回复<hr>');
 											}); 
+											$(viewId).html("");
+											$(viewId).html($('#commentContentTmp').html());
+											$(viewId).show();		
 										}
 									});
-									$(viewId).html("");
-									$(viewId).html($('#commentContentTmp').html());
-									$(viewId).show();
 								} else {
 									$(viewId).hide();
 								}
