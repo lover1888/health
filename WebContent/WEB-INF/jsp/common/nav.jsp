@@ -44,7 +44,9 @@
       	<div class="input-group">
 	      <input type="text" class="form-control" placeholder="输入关键字搜索">
 	      <span class="input-group-btn">
-	        <button class="btn btn-default" type="submit">Go!</button>
+	     	<button type="submit" class="btn btn-default" aria-label="Search">
+			  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+			</button>
 	      </span>
 	    </div>
       </form>
@@ -54,7 +56,28 @@
   				<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> <span class="badge">1</span>
 			</button>&nbsp;
         </li>
-        <li><button type="button" class="btn btn-primary navbar-btn"  data-toggle="modal" data-target="#loginModal">立即登录</button></li>
+        <li>
+        	<shiro:guest>
+	        	<button type="button" class="btn btn-primary navbar-btn"  data-toggle="modal" data-target="#loginModal">立即登录</button>
+	        </shiro:guest>
+	        <shiro:user>
+				<c:set var="name"><shiro:principal/></c:set>
+				<div class="dropdown">
+				  <button class="btn btn-default navbar-btn dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+				    <shiro:principal/>
+				    <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+				    <li role="presentation"><a role="menuitem" tabindex="-1" href="<c:url value='/u/${name }' />">我的主页</a></li>
+				    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">收藏夹</a></li>
+				    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">帐号设置</a></li>
+				    <li role="presentation" class="divider"></li>
+				    <li role="presentation"><a role="menuitem" tabindex="-1" href="<c:url value='/logout' />">退出</a></li>
+				  </ul>
+				</div>
+			</shiro:user>
+        
+        </li>
         <jsp:include page="/WEB-INF/bsplugin/loginmodal.jsp"></jsp:include>
       </ul>
     </div><!-- /.navbar-collapse -->

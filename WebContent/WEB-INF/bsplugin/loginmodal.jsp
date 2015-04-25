@@ -13,20 +13,20 @@
 				<div class="col-md-6">
 					<div class="container-fluid">
 						<h1><small><strong>创建新帐号</strong></small></h1>
-						<form>
+						<form action="<c:url value='/register' />" method="post">
 							<div class="form-group">
 								<label for="userName">用户名</label>
-								<input type="text" class="form-control" id="userName" placeholder="字母、数字等，用户名唯一">
+								<input type="text" class="form-control" id="userName" name="userName" placeholder="字母、数字等，用户名唯一">
 							</div>
 							<div class="form-group">
 								<label for="email">Email</label>
-								<input type="email" class="form-control" id="email" placeholder="hi@kanbingba.cn">
+								<input type="email" class="form-control" id="email" name="email" placeholder="hi@kanbingba.cn">
 							</div>
 							<div class="form-group">
 								<label for="password">密码</label>
-								<input type="password" class="form-control" id="password" placeholder="不少于6位">
+								<input type="password" class="form-control" id="password" name="password" placeholder="不少于6位">
 							</div>
-							<label>同意并接受<a href="">《服务条款》</a></label>
+							<label>同意并接受<a href="#">《服务条款》</a></label>
 							<button type="submit" class="btn btn-primary">注册</button>
 						</form>
 					</div>
@@ -35,14 +35,14 @@
 				<div class="col-md-6">
 					<div class="container-fluid">
 						<h1><small><strong>用户登录</strong></small></h1>
-						<form>
+						<form action="<c:url value='/loginAct' />" method="post">
 							<div class="form-group">
-								<label for="email">Email</label>
-								<input type="email" class="form-control" id="email" placeholder="hi@kanbingba.cn">
+								<label for="userName">用户名</label>
+								<input type="text" class="form-control" id="userName" name="userName" placeholder="用户名">
 							</div>
 							<div class="form-group">
 								<label for="password">密码</label>
-								<input type="password" class="form-control" id="password" placeholder="不少于6位">
+								<input type="password" class="form-control" id="password" name="password" placeholder="不少于6位">
 							</div>
 							 <div class="checkbox">
 							    <label>
@@ -53,7 +53,7 @@
 						</form>
 					</div>
 				</div>
-			</div>			      	
+			</div>
       	
       </div>
       <hr class="kbb-hr">
@@ -62,7 +62,6 @@
       	<a href="">忘记密码</a><br><br>
       	</p>
       </div>
-      			      
     </div>
   </div>
 </div>

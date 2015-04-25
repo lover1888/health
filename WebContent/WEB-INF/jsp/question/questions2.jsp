@@ -13,6 +13,12 @@
   <body>
 
   <div class="container">
+  <c:if test="${not empty msg }">
+  	<div class="alert alert-warning alert-dismissible" role="alert">
+	  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	  <strong>Warning!</strong> ${msg }
+	</div>
+  </c:if>
 	<jsp:include page="/WEB-INF/jsp/common/nav.jsp"></jsp:include>
 	  
     <div class="row">

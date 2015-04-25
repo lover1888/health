@@ -24,6 +24,7 @@ import org.health.model.Permissions;
 import org.health.model.Role;
 import org.health.model.User;
 import org.health.service.UserService;
+import org.health.util.KbbConstants;
 import org.nutz.lang.Lang;
 import org.nutz.mvc.Mvcs;
 
@@ -70,7 +71,10 @@ public class MyRealm extends AuthorizingRealm {
 		String userName = (String) token.getPrincipal();
 		User u = getUserService().findUser(userName);
 		if (u == null) {
-			throw new UnknownAccountException();// 没找到帐号
+			throw new UnknownAccountException("帐号未注册.");// 没找到帐号
+		}
+		if(KbbConstants.Flag_Normal==u.getFlag()){
+			throw new UnknownAccountException("帐号未激活.");
 		}
 		
 		// //交给AuthenticatingRealm使用CredentialsMatcher进行密码匹配，如果觉得人家的不好可以在此判断或自定义实现

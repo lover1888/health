@@ -58,10 +58,15 @@ public class QuestionModule {
 	// 问题列表
 	@At("/question/*")
 	@Ok("jsp:jsp.question.questions2")
-	public void doGetQuestions(String type, int page, HttpServletRequest req) {
+	public void doGetQuestions(String type, int page, String msg, HttpServletRequest req) {
 		if (Strings.isEmpty(type)) {
 			type = "newest";
 		}
+		if(!Lang.isEmpty(msg)){
+			log.error(msg);
+			req.setAttribute("msg", KbbUtils.unescape(msg));	
+		}
+		
 		req.setAttribute("type", type);
 		if (page <= 0) {
 			page = 1;

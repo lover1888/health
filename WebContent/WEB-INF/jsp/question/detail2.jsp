@@ -75,7 +75,7 @@
 											}); 
 											$(viewId).html("");
 											$(viewId).html($('#commentContentTmp').html());
-											$(viewId).show();		
+											$(viewId).show();
 										}
 									});
 								} else {

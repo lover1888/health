@@ -19,6 +19,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.health.model.User;
 import org.health.service.UserService;
 import org.health.util.KbbConstants;
+import org.health.util.KbbUtils;
 import org.health.util.MailSender;
 import org.nutz.ioc.loader.annotation.Inject;
 import org.nutz.ioc.loader.annotation.IocBean;
@@ -48,9 +49,13 @@ public class UserModule {
 	}
 	
 	@At("/register")
-	public void doRegister(@Param("..") User user, HttpServletRequest req){
+	@Ok("redirect:/question?msg=${obj}")
+	@Fail("json")
+	public String doRegister(@Param("..") User user, HttpServletRequest req){
 		this.userService.register(user, req);
+		return KbbUtils.toUtf8String("一封注册邮件已经发送至 "+user.getEmail()+"，请根据提示完成注册");
 	}
+	
 	@At("/register/?/confirm/?")
 	public void doRegisterConfirm(String userId, long time){
 		long be = System.currentTimeMillis() - time;
@@ -71,7 +76,7 @@ public class UserModule {
 	
 	@At("/loginAct")
 	@Ok("redirect:/question")
-	@Fail("jsp:jsp.login")
+	@Fail("json")
 	public void doLoginAction(@Param("userName") String userName, @Param("password") String password, HttpServletRequest req){
 		 Subject subject = SecurityUtils.getSubject();  
 		 ThreadContext.bind(subject);
@@ -81,10 +86,9 @@ public class UserModule {
 			User u = this.userService.findUser(userName);
 			subject.getSession().setAttribute(KbbConstants.SESSION_USER_ID, u.getUserId());
 			
-//			this.mailSender.sendText("hengfei.jin@kaihuahealth.com", "登录", "["+userName+"]登录了。");
 		 }catch(UnknownAccountException e){
-			 req.setAttribute("errmsg", "帐号不存在");
-			 throw Lang.makeThrow("帐号不存在", new Object[0]);
+			 req.setAttribute("errmsg", e.getMessage());
+			 throw Lang.makeThrow(e.getMessage(), new Object[0]);
 		 }catch(IncorrectCredentialsException e){
 			  req.setAttribute("errmsg", "密码错误");
 			 throw Lang.makeThrow("密码错误", new Object[0]);

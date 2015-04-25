@@ -45,7 +45,12 @@ public class UserService extends EntityService<User> {
 	private MailSender mailSender;
 
 	public User findUser(String userName){
-		User user = dao().fetch(User.class, Cnd.where("userName", "=", userName));
+		User user = dao().fetch(User.class, Cnd.where("userName", "=", userName).and("flag", "=", 0));
+		return user;
+	}
+	
+	public User findUserByCondition(String userName, String email){
+		User user = dao().fetch(User.class, Cnd.where("email", "=", email).or("userName", "=", userName));
 		return user;
 	}
 	
@@ -63,7 +68,12 @@ public class UserService extends EntityService<User> {
 		}
 		User u = findUser(user.getUserName());
 		if(!Lang.isEmpty(u)){
-			throw Lang.makeThrow("用户名已经被注册", new Object[0]);
+			if(u.getUserName().equals(user.getUserName())){
+				throw Lang.makeThrow("用户名已经被注册", new Object[0]);
+			}
+			if(u.getEmail().equals(user.getEmail())){
+				throw Lang.makeThrow("邮箱地址已经被注册", new Object[0]);
+			}
 		}
 		
 		user.setUserId(KbbUtils.generateID());
@@ -80,7 +90,6 @@ public class UserService extends EntityService<User> {
 				+ "请在1小时内点击此链接以完成注册<br>"
 				+ url;
 		this.mailSender.sendHtml(user.getEmail(), "欢迎加入看病吧-问答社区", content);
-		
 		return u;
 	}
 	
