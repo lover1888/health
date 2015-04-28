@@ -8,6 +8,9 @@
 <script src="${baseURI }/js/jquery-1.11.2.min.js"></script>
 <script src="${baseURI }/js/dialog-min.js"></script>
 <script src="${baseURI }/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="${baseURI }/js/xheditor-1.2.2.min.js"></script>
+<script type="text/javascript" src="${baseURI }/js/xheditor_lang/zh-cn.js"></script>
+
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>

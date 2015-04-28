@@ -143,11 +143,16 @@
 							</span>
 						</div>
 					</div>
-					
 					<hr>
 				</c:forEach>
-	    		
+				<h4>撰写答案</h4>
+				<form action="<c:url value='/q/answer'></c:url>" method="post">
+					<textarea class="form-control xheditor" rows="8" cols="100" name="content" placeholder="撰写答案..."></textarea>
+					<input type="hidden" name="questionId" value="${detailVo.question.questionId }"><br><br>
+					<button type="submit" class="btn btn-primary">提交回答</button>
+				</form>
     		</div>
+    		
     		
     		
     	</div>

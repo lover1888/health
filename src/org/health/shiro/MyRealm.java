@@ -73,7 +73,7 @@ public class MyRealm extends AuthorizingRealm {
 		if (u == null) {
 			throw new UnknownAccountException("帐号未注册.");// 没找到帐号
 		}
-		if(KbbConstants.Flag_Normal==u.getFlag()){
+		if(KbbConstants.Flag_Normal!=u.getFlag()){
 			throw new UnknownAccountException("帐号未激活.");
 		}
 		
