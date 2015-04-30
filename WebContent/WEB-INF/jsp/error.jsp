@@ -7,5 +7,8 @@
 </head>
 <body>
 <h1>你出错喽</h1>
+<h3>${detailMessage }
+${errorMsg }
+</h3>
 </body>
 </html>

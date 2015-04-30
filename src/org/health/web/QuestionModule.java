@@ -7,6 +7,7 @@
  */
 package org.health.web;
 
+import java.io.File;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +33,12 @@ import org.nutz.lang.Strings;
 import org.nutz.log.Log;
 import org.nutz.log.Logs;
 import org.nutz.mvc.View;
+import org.nutz.mvc.annotation.AdaptBy;
 import org.nutz.mvc.annotation.At;
 import org.nutz.mvc.annotation.Fail;
 import org.nutz.mvc.annotation.Ok;
 import org.nutz.mvc.annotation.Param;
+import org.nutz.mvc.upload.UploadAdaptor;
 import org.nutz.mvc.view.ServerRedirectView;
 import org.nutz.mvc.view.ViewWrapper;
 
@@ -85,6 +88,12 @@ public class QuestionModule {
 			req.setAttribute("pagination", pgs);
 		}
 	}
+	
+	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
+	public void uploadFile(@Param("id") int id, @Param("file") File f){
+		
+	}
+	
 
 	
 	@At("/question/ask")
@@ -124,15 +133,16 @@ public class QuestionModule {
 
 	// 回答问题
 	@At("/q/answer")
-	public View doAnswerQuestion(@Param("..") Answer answer) {
+	@Fail("jsp:jsp.error")
+	public View doAnswerQuestion(@Param("..") Answer answer, HttpServletRequest req) {
 		String userId = KbbUtils.getSession(KbbConstants.SESSION_USER_ID);
 		answer.setUserId(userId);
 		try {
 			this.questionService.answerQuestion(answer);
 		} catch (Exception e) {
-			e.printStackTrace();
+			req.setAttribute("errorMsg", e.getMessage());
+			throw Lang.makeThrow(e.getMessage(), new Object[0]);
 		}
-		
 		return new ViewWrapper(new ServerRedirectView("/q/"
 				+ answer.getQuestionId()), null);
 	}
