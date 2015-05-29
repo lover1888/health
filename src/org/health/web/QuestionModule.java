@@ -89,12 +89,17 @@ public class QuestionModule {
 		}
 	}
 	
+	@At("/uploadfile")
 	@AdaptBy(type = UploadAdaptor.class, args = { "${app.root}/WEB-INF/tmp" })
-	public void uploadFile(@Param("id") int id, @Param("file") File f){
+	public void uploadFile(@Param("id") int id, @Param("file") File tf){
+//		File f = tf.getFile();                       // 这个是保存的临时文件
+//	    FieldMeta meta = tf.getMeta();               // 这个原本的文件信息
+//	    String oldName = meta.getFileLocalName();    // 这个时原本的文件名称
+		
+		System.out.println(id);
+		System.out.println(tf.getName());
 		
 	}
-	
-
 	
 	@At("/question/ask")
 	@Ok("jsp:jsp.question.ask")

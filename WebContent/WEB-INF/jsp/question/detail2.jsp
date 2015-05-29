@@ -13,10 +13,10 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $('#summernote').summernote({
-            height: 150,
-            onImageUpload: function(files, editor, welEditable) {
+            height: 150
+            /* onImageUpload: function(files, editor, welEditable) {
                 sendFile(files[0], editor, welEditable);
-            }
+            } */
         });
         function sendFile(file, editor, welEditable) {
             data = new FormData();
@@ -25,7 +25,7 @@
             $.ajax({
                 data: data,
                 type: "POST",
-                url: "Your URL POST (php)",
+                url: '${baseURI}/uploadfile',
                 cache: false,
                 contentType: false,
                 processData: false,
